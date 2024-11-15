@@ -1,0 +1,81 @@
+version: '3'
+
+services:
+  openldap:
+    image: osixia/openldap:latest
+    container_name: openldap
+    environment:
+      - LDAP_ORGANISATION=ExampleCorp
+      - LDAP_DOMAIN=example.com
+      - LDAP_ADMIN_PASSWORD=admin_password
+    ports:
+      - "389:389"
+      - "636:636"
+    volumes:
+      - ldap_data:/var/lib/ldap
+      - ldap_config:/etc/ldap/slapd.d
+
+  phpldapadmin:
+    image: osixia/phpldapadmin:latest
+    container_name: phpldapadmin
+    environment:
+      - PHPLDAPADMIN_LDAP_HOSTS=openldap
+    ports:
+      - "6443:443"
+    depends_on:
+      - openldap
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: keycloak
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_HEALTH_ENABLED=true
+      # For LDAP integration
+      - KC_HOSTNAME_STRICT=false
+      - KC_HOSTNAME_STRICT_HTTPS=false
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm.json
+    command:
+      - start-dev
+      - --import-realm
+    depends_on:
+      - openldap
+
+  flask-app:
+    build: 
+      context: ./flask-app
+      dockerfile: Dockerfile
+    container_name: flask-app
+    ports:
+      - "5000:5000"
+    environment:
+      - LDAP_HOST=openldap
+      - LDAP_PORT=389
+      - KEYCLOAK_URL=http://keycloak:8080
+    depends_on:
+      - openldap
+      - keycloak
+
+  react-app:
+    build:
+      context: ./react-app
+      dockerfile: Dockerfile
+    container_name: react-app
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:5000
+      - REACT_APP_KEYCLOAK_URL=http://localhost:8080
+      - REACT_APP_KEYCLOAK_REALM=demo-sso-realm
+      - REACT_APP_KEYCLOAK_CLIENT_ID=react-app
+    depends_on:
+      - flask-app
+      - keycloak
+
+volumes:
+  ldap_data:
+  ldap_config:
