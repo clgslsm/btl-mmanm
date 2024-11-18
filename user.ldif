@@ -1,0 +1,56 @@
+# Define the top-level entry for the domain
+dn: dc=example,dc=com
+dc: example
+o: ExampleCorp
+objectClass: top
+objectClass: dcObject
+objectClass: organization
+
+# Organizational Unit for Users
+dn: ou=users,dc=example,dc=com
+objectClass: organizationalUnit
+ou: users
+
+# Organizational Unit for Groups
+dn: ou=groups,dc=example,dc=com
+objectClass: organizationalUnit
+ou: groups
+
+# Sample User 1
+dn: uid=johndoe,ou=users,dc=example,dc=com
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: top
+cn: John Doe
+sn: Doe
+uid: johndoe
+uidNumber: 1001
+gidNumber: 1001
+homeDirectory: /home/johndoe
+mail: johndoe@example.com
+userPassword: {SSHA}dXNlcjEyMzQ1 # Replace with your encrypted password
+loginShell: /bin/bash
+
+# Sample User 2
+dn: uid=janedoe,ou=users,dc=example,dc=com
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: top
+cn: Jane Doe
+sn: Doe
+uid: janedoe
+uidNumber: 1002
+gidNumber: 1002
+homeDirectory: /home/janedoe
+mail: janedoe@example.com
+userPassword: {SSHA}dXNlcjY3ODkw # Replace with your encrypted password
+loginShell: /bin/bash
+
+# Sample Group
+dn: cn=developers,ou=groups,dc=example,dc=com
+objectClass: top
+objectClass: posixGroup
+cn: developers
+gidNumber: 1001
+memberUid: johndoe
+memberUid: janedoe

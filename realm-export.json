@@ -667,7 +667,7 @@
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
-      "secret": "**********",
+      "secret": "WOn0ssWpd5EZmZG14NpEepvMvc3I7man",
       "redirectUris": [
         "http://localhost:5000/*"
       ],
@@ -1781,7 +1781,7 @@
             "-1"
           ],
           "bindCredential": [
-            "**********"
+            "admin_password"
           ],
           "vendor": [
             "other"

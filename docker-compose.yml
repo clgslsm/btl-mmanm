@@ -38,44 +38,13 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm.json
+      - ./realm-export.json:/opt/keycloak/data/import/realm-export.json
     command:
       - start-dev
       - --import-realm
+      - --health-enabled=true
     depends_on:
       - openldap
-
-  flask-app:
-    build: 
-      context: ./flask-app
-      dockerfile: Dockerfile
-    container_name: flask-app
-    ports:
-      - "5000:5000"
-    environment:
-      - LDAP_HOST=openldap
-      - LDAP_PORT=389
-      - KEYCLOAK_URL=http://keycloak:8080
-    depends_on:
-      - openldap
-      - keycloak
-
-  react-app:
-    build:
-      context: ./react-app
-      dockerfile: Dockerfile
-    container_name: react-app
-    ports:
-      - "3000:3000"
-    environment:
-      - REACT_APP_API_URL=http://localhost:5000
-      - REACT_APP_KEYCLOAK_URL=http://localhost:8080
-      - REACT_APP_KEYCLOAK_REALM=demo-sso-realm
-      - REACT_APP_KEYCLOAK_CLIENT_ID=react-app
-    depends_on:
-      - flask-app
-      - keycloak
-
 volumes:
   ldap_data:
   ldap_config:

@@ -19,7 +19,26 @@ def home():
 @app.route('/profile')
 @oidc.require_login
 def profile():
-    info = oidc.user_getinfo(['preferred_username', 'email'])
+    # Get user info including access token
+    info = oidc.user_getinfo(['preferred_username', 'email', 'sub'])
+    
+    # Get the access token from the OAuth info
+    access_token = oidc.get_access_token()
+    print(access_token)
+    
+    # Make request to Keycloak userinfo endpoint using the access token
+    headers = {'Authorization': f'Bearer {access_token}'}
+    userinfo_endpoint = 'http://localhost:8080/realms/demo-sso-realm/protocol/openid-connect/userinfo'
+    
+    try:
+        response = requests.get(userinfo_endpoint, headers=headers)
+        if response.status_code == 200:
+            userinfo = response.json()
+            # Merge userinfo with existing info
+            info.update(userinfo)
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching user info: {e}")
+    
     return render_template('profile.html', info=info)
 
 @app.route('/logout')
