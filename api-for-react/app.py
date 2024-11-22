@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify, g
 from flask_oidc import OpenIDConnect
 import requests
-import python_jwt as jwt  # For decoding tokens locally
+import jwt  # For decoding tokens locally
 from flasgger import Swagger  # Import Swagger
 import sqlite3
 
@@ -46,12 +46,19 @@ def query_db(query, args=(), one=False):
 def init_db():
     with app.app_context():
         db = get_db()
+        db.execute('DROP TABLE IF EXISTS students')
         db.execute('''
             CREATE TABLE IF NOT EXISTS students (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 email TEXT UNIQUE NOT NULL,
                 name TEXT NOT NULL,
-                course TEXT NOT NULL
+                course TEXT NOT NULL,
+                enrollment_date TEXT NOT NULL,
+                expected_graduation TEXT,
+                gpa FLOAT DEFAULT 0.0,
+                credits_completed INTEGER DEFAULT 0,
+                major TEXT NOT NULL,
+                minor TEXT
             )
         ''')
         db.commit()
@@ -71,34 +78,30 @@ def get_keycloak_public_key():
         response = requests.get(f"{KEYCLOAK_PUBLIC_KEY_URL}")
         response.raise_for_status()
         key_data = response.json()
-        return f"-----BEGIN PUBLIC KEY-----\n{key_data['public_key']}\n-----END PUBLIC KEY-----"
+        # Format the public key properly
+        public_key = key_data.get('public_key')
+        return f"-----BEGIN PUBLIC KEY-----\n{public_key}\n-----END PUBLIC KEY-----"
     except Exception as e:
         print(f"Error fetching public key: {e}")
         return None
 
 PUBLIC_KEY = get_keycloak_public_key()
 
-
 def validate_token(token):
-    """Validate the access token using Keycloak introspection endpoint or local decoding."""
+    """Validate the access token using local JWT validation."""
     try:
-        # Option 1: Use Keycloak Introspection Endpoint
-        response = requests.post(
-            KEYCLOAK_INTROSPECTION_ENDPOINT,
-            data={'token': token, 'client_id': 'flask-app', 'client_secret': 'WOn0ssWpd5EZmZG14NpEepvMvc3I7man'},
-            headers={'Content-Type': 'application/x-www-form-urlencoded'}
+        # Remove 'Bearer ' prefix if present
+        if token.startswith('Bearer '):
+            token = token[7:]
+        
+        # Decode the token using PyJWT
+        claims = jwt.decode(
+            token, 
+            PUBLIC_KEY, 
+            algorithms=["RS256"],
+            options={"verify_aud": False}  # Skip audience validation if not needed
         )
-        print(KEYCLOAK_INTROSPECTION_ENDPOINT)
-        print(response.json())
-        if response.status_code == 200 and response.json().get('active'):
-            return response.json()  # Return decoded token info
-        return None
-
-        # Option 2: Local JWT Decoding
-        # header, claims = jwt.verify_jwt(token, PUBLIC_KEY, ['RS256'], audience='flask-app')
-        # print(claims)
-        # return claims
-
+        return claims
     except Exception as e:
         print(f"Token validation error: {e}")
         return None
@@ -134,6 +137,18 @@ def get_resource():
                     type: string
                   course:
                     type: string
+                  enrollment_date:
+                    type: string
+                  expected_graduation:
+                    type: string
+                  gpa:
+                    type: number
+                  credits_completed:
+                    type: integer
+                  major:
+                    type: string
+                  minor:
+                    type: string
       401:
         description: Unauthorized - Invalid or missing token
       403:
@@ -141,23 +156,37 @@ def get_resource():
     """
     auth_header = request.headers.get('Authorization')
     if not auth_header:
-        return jsonify({"error": "Missing or invalid Authorization header"}), 401
+        return jsonify({"error": "Missing Authorization header"}), 401
 
-    token = auth_header
-    decoded_token = validate_token(token)
+    decoded_token = validate_token(auth_header)
     if not decoded_token:
         return jsonify({"error": "Invalid or expired token"}), 401
 
-    roles = decoded_token.get('resource_access', {}).get('flask-app', {}).get('roles', [])
-    if 'Dev' not in roles:
+    print("decoded_token: ", decoded_token)
+    roles = decoded_token.get('resource_access', {}).get('react-app', {}).get('roles', [])
+    if 'Student' not in roles:
         return jsonify({"error": "Insufficient permissions"}), 403
 
     email = decoded_token.get('email')
     if not email:
         return jsonify({"error": "Email not found in token"}), 401
 
+    # Get column names from the students table
+    columns = ['id', 'email', 'name', 'course', 'enrollment_date', 'expected_graduation', 
+              'gpa', 'credits_completed', 'major', 'minor']
+    
     students = query_db('SELECT * FROM students WHERE email = ?', [email])
-    return jsonify({"message": "GET request successful", "data": students})
+    
+    # Transform the data into a list of dictionaries
+    formatted_students = []
+    for student in students:
+        student_dict = {columns[i]: student[i] for i in range(len(columns))}
+        formatted_students.append(student_dict)
+
+    return jsonify({
+        "message": "GET request successful",
+        "data": formatted_students[0] if formatted_students else None
+    })
 
 
 @app.route('/api/resource', methods=['POST'])
@@ -178,6 +207,8 @@ def post_resource():
           required:
             - name
             - course
+            - enrollment_date
+            - major
           properties:
             name:
               type: string
@@ -185,6 +216,27 @@ def post_resource():
             course:
               type: string
               example: "Computer Science"
+            enrollment_date:
+              type: string
+              format: date
+              example: "2024-03-15"
+            expected_graduation:
+              type: string
+              format: date
+              example: "2028-05-30"
+            gpa:
+              type: number
+              format: float
+              example: 3.5
+            credits_completed:
+              type: integer
+              example: 60
+            major:
+              type: string
+              example: "Computer Science"
+            minor:
+              type: string
+              example: "Mathematics"
     responses:
       201:
         description: Student created successfully
@@ -197,15 +249,14 @@ def post_resource():
     """
     auth_header = request.headers.get('Authorization')
     if not auth_header:
-        return jsonify({"error": "Missing or invalid Authorization header"}), 401
+        return jsonify({"error": "Missing Authorization header"}), 401
 
-    token = auth_header
-    decoded_token = validate_token(token)
+    decoded_token = validate_token(auth_header)
     if not decoded_token:
         return jsonify({"error": "Invalid or expired token"}), 401
 
-    roles = decoded_token.get('resource_access', {}).get('flask-app', {}).get('roles', [])
-    if 'Dev' not in roles:
+    roles = decoded_token.get('resource_access', {}).get('react-app', {}).get('roles', [])
+    if 'Student' not in roles:
         return jsonify({"error": "Insufficient permissions"}), 403
 
     email = decoded_token.get('email')
@@ -215,8 +266,20 @@ def post_resource():
     data = request.json
     try:
         db = get_db()
-        db.execute('INSERT INTO students (email, name, course) VALUES (?, ?, ?)',
-                   [email, data['name'], data['course']])
+        db.execute('''
+            INSERT INTO students (
+                email, name, course, enrollment_date, expected_graduation,
+                gpa, credits_completed, major, minor
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', [
+            email, data['name'], data['course'],
+            data['enrollment_date'],
+            data.get('expected_graduation'),  # Optional field
+            data.get('gpa', 0.0),  # Default to 0.0 if not provided
+            data.get('credits_completed', 0),  # Default to 0 if not provided
+            data['major'],
+            data.get('minor')  # Optional field
+        ])
         db.commit()
         return jsonify({"message": "POST request successful", "data": data}), 201
     except sqlite3.IntegrityError:
@@ -241,13 +304,27 @@ def put_resource():
           required:
             - name
             - course
+            - major
           properties:
             name:
               type: string
-              example: "John Doe"
             course:
               type: string
-              example: "Computer Science"
+            enrollment_date:
+              type: string
+              format: date
+            expected_graduation:
+              type: string
+              format: date
+            gpa:
+              type: number
+              format: float
+            credits_completed:
+              type: integer
+            major:
+              type: string
+            minor:
+              type: string
     responses:
       200:
         description: Student data updated successfully
@@ -258,15 +335,14 @@ def put_resource():
     """
     auth_header = request.headers.get('Authorization')
     if not auth_header:
-        return jsonify({"error": "Missing or invalid Authorization header"}), 401
+        return jsonify({"error": "Missing Authorization header"}), 401
 
-    token = auth_header
-    decoded_token = validate_token(token)
+    decoded_token = validate_token(auth_header)
     if not decoded_token:
         return jsonify({"error": "Invalid or expired token"}), 401
 
-    roles = decoded_token.get('resource_access', {}).get('flask-app', {}).get('roles', [])
-    if 'Dev' not in roles:
+    roles = decoded_token.get('resource_access', {}).get('react-app', {}).get('roles', [])
+    if 'Student' not in roles:
         return jsonify({"error": "Insufficient permissions"}), 403
 
     email = decoded_token.get('email')
@@ -275,8 +351,21 @@ def put_resource():
 
     data = request.json
     db = get_db()
-    db.execute('UPDATE students SET name = ?, course = ? WHERE email = ?',
-               [data['name'], data['course'], email])
+    db.execute('''
+        UPDATE students 
+        SET name = ?, course = ?, enrollment_date = ?, expected_graduation = ?,
+            gpa = ?, credits_completed = ?, major = ?, minor = ?
+        WHERE email = ?
+    ''', [
+        data['name'], data['course'],
+        data.get('enrollment_date'),
+        data.get('expected_graduation'),
+        data.get('gpa', 0.0),
+        data.get('credits_completed', 0),
+        data['major'],
+        data.get('minor'),
+        email
+    ])
     db.commit()
     return jsonify({"message": "PUT request successful", "data": data})
 
@@ -291,24 +380,25 @@ def delete_resource():
     security:
       - Bearer: []
     responses:
-      204:
+      200:
         description: Student deleted successfully
       401:
         description: Unauthorized - Invalid or missing token
       403:
         description: Forbidden - Insufficient permissions
+      404:
+        description: Not found - No student record found for this email
     """
     auth_header = request.headers.get('Authorization')
     if not auth_header:
-        return jsonify({"error": "Missing or invalid Authorization header"}), 401
+        return jsonify({"error": "Missing Authorization header"}), 401
 
-    token = auth_header
-    decoded_token = validate_token(token)
+    decoded_token = validate_token(auth_header)
     if not decoded_token:
         return jsonify({"error": "Invalid or expired token"}), 401
 
-    roles = decoded_token.get('resource_access', {}).get('flask-app', {}).get('roles', [])
-    if 'Dev' not in roles:
+    roles = decoded_token.get('resource_access', {}).get('react-app', {}).get('roles', [])
+    if 'Student' not in roles:
         return jsonify({"error": "Insufficient permissions"}), 403
 
     email = decoded_token.get('email')
@@ -316,38 +406,15 @@ def delete_resource():
         return jsonify({"error": "Email not found in token"}), 401
 
     db = get_db()
-    db.execute('DELETE FROM students WHERE email = ?', [email])
+    cursor = db.cursor()
+    cursor.execute('DELETE FROM students WHERE email = ?', [email])
     db.commit()
-    return jsonify({"message": "DELETE request successful"}), 204
-
-
-@app.route('/api/userinfo', methods=['GET'])
-@oidc.require_login
-def userinfo():
-    """
-    Fetch user info using the access token.
-    ---
-    tags:
-      - User Info
-    responses:
-      200:
-        description: User info retrieved successfully
-      500:
-        description: Error fetching user info
-    """
-    """Fetch user info using the access token."""
-    access_token = oidc.get_access_token()
-    headers = {'Authorization': f'Bearer {access_token}'}
-    userinfo_endpoint = f"{KEYCLOAK_SERVER}/realms/{KEYCLOAK_REALM}/protocol/openid-connect/userinfo"
-
-    try:
-        response = requests.get(userinfo_endpoint, headers=headers)
-        if response.status_code == 200:
-            return jsonify(response.json())
-    except requests.exceptions.RequestException as e:
-        return jsonify({"error": f"Error fetching user info: {e}"}), 500
-
-    return jsonify({"error": "Unable to fetch user info"}), 500
+    
+    # Check if any row was actually deleted
+    if cursor.rowcount == 0:
+        return jsonify({"error": "No student record found for this email"}), 404
+        
+    return jsonify({"message": "DELETE request successful"}), 200
 
 
 if __name__ == '__main__':

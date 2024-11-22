@@ -7,6 +7,7 @@ function App({ keycloak }) {
       <h2>User Profile</h2>
       <p><strong>Username:</strong> {keycloak.tokenParsed.preferred_username}</p>
       <p><strong>Email:</strong> {keycloak.tokenParsed.email}</p>
+      <p><strong>Token:</strong> {keycloak.token}</p>
     </div>
   );
 }

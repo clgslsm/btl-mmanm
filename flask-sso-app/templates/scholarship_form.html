@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>{% if scholarship %}Edit{% else %}Add{% endif %} Scholarship</h2>
+
+<form method="POST">
+    <div class="mb-3">
+        <label for="title" class="form-label">Title</label>
+        <input type="text" class="form-control" id="title" name="title" required 
+               value="{{ scholarship.title if scholarship else '' }}">
+    </div>
+    
+    <div class="mb-3">
+        <label for="amount" class="form-label">Amount ($)</label>
+        <input type="number" step="0.01" class="form-control" id="amount" name="amount" required 
+               value="{{ scholarship.amount if scholarship else '' }}">
+    </div>
+    
+    <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
+        <textarea class="form-control" id="description" name="description" rows="3" required>{{ scholarship.description if scholarship else '' }}</textarea>
+    </div>
+    
+    <div class="mb-3">
+        <label for="deadline" class="form-label">Deadline</label>
+        <input type="date" class="form-control" id="deadline" name="deadline" required 
+               value="{{ scholarship.deadline.strftime('%Y-%m-%d') if scholarship else '' }}">
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a href="{{ url_for('scholarships') }}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}
