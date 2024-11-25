@@ -4,9 +4,9 @@ from flask_sqlalchemy import SQLAlchemy
 import requests
 from datetime import datetime
 import json, pytz, jwt
+import os
 
-with open('client_secrets.json') as f:
-    client_secrets = json.load(f)
+client_secrets = json.loads(os.getenv("CLIENT_SECRETS", "{}"))
 
 app = Flask(__name__)
 app.config.update({
@@ -51,19 +51,6 @@ def profile():
     else:
         token_expiry = None
     
-    # Make request to Keycloak userinfo endpoint using the access token
-    # headers = {'Authorization': f'Bearer {access_token}'}
-    # userinfo_endpoint = app.config['OIDC_CLIENT_SECRETS']['web']['userinfo_uri']
-    
-    # try:
-    #     response = requests.get(userinfo_endpoint, headers=headers)
-    #     if response.status_code == 200:
-    #         userinfo = response.json()
-    #         # Merge userinfo with existing info
-    #         info.update(userinfo)
-    # except requests.exceptions.RequestException as e:
-    #     print(f"Error fetching user info: {e}")
-    
     return render_template('profile.html', info=info, token_expiry=token_expiry, access_token=access_token, oidc=oidc)
 
 @app.route('/logout_sso')
@@ -76,10 +63,6 @@ def logout_sso():
 
 @app.route('/')
 def home():
-    # if oidc.user_loggedin:
-    #     print("User is logged in")
-    # else:
-    #     print("User is not logged in")
     return render_template('home.html', oidc=oidc)
 
 @app.template_filter('timestamp_to_date')
@@ -123,6 +106,9 @@ def refresh_token():
     else:
         return jsonify({'error': 'Failed to refresh the token', 'details': response.json()}), 400
 
+@app.route('/public')
+def public():
+    return render_template('public.html', oidc=oidc)
 
 @app.route('/scholarships')
 @oidc.require_login

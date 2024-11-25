@@ -3,17 +3,19 @@ from flask_oidc import OpenIDConnect
 import requests
 import jwt  # For decoding tokens locally
 from flasgger import Swagger  # Import Swagger
-import sqlite3
+import sqlite3, json, os
+
+client_secrets = json.load(os.getenv("CLIENT_SECRETS", "{}"))
 
 app = Flask(__name__)
 app.config.update({
-    'SECRET_KEY': 'uaUkCfrrEmSqf13Qkk5f4bgeLwBhMqNi',
-    'OIDC_CLIENT_SECRETS': 'client_secrets.json',
+    'SECRET_KEY': client_secrets['web']['client_secret'],
+    'OIDC_CLIENT_SECRETS': client_secrets,
     'OIDC_SCOPES': ['openid', 'email', 'profile'],
     'OIDC_INTROSPECTION_AUTH_METHOD': 'client_secret_post',
     'OIDC_USER_INFO_ENABLED': True,
 })
-oidc = OpenIDConnect(app)
+
 swagger = Swagger(app, template={
     'securityDefinitions': {
         'Bearer': {

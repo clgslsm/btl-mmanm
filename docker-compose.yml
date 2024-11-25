@@ -1,19 +1,44 @@
-version: '3'
+name: sso_demo
 
 services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    environment:
+      - KEYCLOAK_ADMIN=${KC_ADMIN_USERNAME:-admin}
+      - KEYCLOAK_ADMIN_PASSWORD=${KC_ADMIN_PASSWD:-admin}
+      - KC_HOSTNAME_STRICT=false
+      - KC_HOSTNAME_STRICT_HTTPS=false
+      - KC_HEALTH_ENABLED=true
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./configs/keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json
+    command:
+      - start-dev
+      - --import-realm
+      - --health-enabled=true
+    depends_on:
+      - openldap
+    networks:
+      - deploy
+      - database
+
   openldap:
     image: osixia/openldap:latest
     container_name: openldap
     environment:
-      - LDAP_ORGANISATION=ExampleCorp
-      - LDAP_DOMAIN=example.com
-      - LDAP_ADMIN_PASSWORD=admin_password
-    ports:
-      - "389:389"
-      - "636:636"
+      - LDAP_ORGANISATION=${LDAP_ORG:-ExampleOrg}
+      - LDAP_DOMAIN=${LDAP_DOMAIN:-example.org}
+      - LDAP_ADMIN_PASSWORD=${LDAP_ADMIN_PASSWORD:-admin}
     volumes:
       - ldap_data:/var/lib/ldap
-      - ldap_config:/etc/ldap/slapd.d
+      - ./configs/ldap:/etc/ldap/slapd.d
+    networks:
+      - database
+    # ports:
+    #   - "389:389"
+    #   - "636:636"
+
 
   phpldapadmin:
     image: osixia/phpldapadmin:latest
@@ -24,27 +49,14 @@ services:
       - "6443:443"
     depends_on:
       - openldap
+    networks:
+      - database
 
-  keycloak:
-    image: quay.io/keycloak/keycloak:latest
-    container_name: keycloak
-    environment:
-      - KEYCLOAK_ADMIN=admin
-      - KEYCLOAK_ADMIN_PASSWORD=admin
-      - KC_HEALTH_ENABLED=true
-      # For LDAP integration
-      - KC_HOSTNAME_STRICT=false
-      - KC_HOSTNAME_STRICT_HTTPS=false
-    ports:
-      - "8080:8080"
-    volumes:
-      - ./realm-export.json:/opt/keycloak/data/import/realm-export.json
-    command:
-      - start-dev
-      - --import-realm
-      - --health-enabled=true
-    depends_on:
-      - openldap
 volumes:
   ldap_data:
-  ldap_config:
+
+networks:
+  deploy:
+    driver: bridge
+  database:
+    driver: bridge
