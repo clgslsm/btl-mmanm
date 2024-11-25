@@ -1,14 +1,13 @@
-import React from 'react';
+import React from "react";
+import { ReactKeycloakProvider } from "@react-keycloak/web";
+import keycloak from "./keycloak";
+import Profile from "./Profile";
 
-function App({ keycloak }) {
+function App() {
   return (
-    <div className="App">
-      <h1>React App</h1>
-      <h2>User Profile</h2>
-      <p><strong>Username:</strong> {keycloak.tokenParsed.preferred_username}</p>
-      <p><strong>Email:</strong> {keycloak.tokenParsed.email}</p>
-      <p><strong>Token:</strong> {keycloak.token}</p>
-    </div>
+    <ReactKeycloakProvider authClient={keycloak}>
+      <Profile />
+    </ReactKeycloakProvider>
   );
 }
 

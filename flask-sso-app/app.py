@@ -1,13 +1,17 @@
-from flask import Flask, redirect, url_for, render_template, session, request, flash
+from flask import Flask, redirect, url_for, render_template, session, request, flash, jsonify
 from flask_oidc import OpenIDConnect
 from flask_sqlalchemy import SQLAlchemy
 import requests
 from datetime import datetime
+import json, pytz, jwt
+
+with open('client_secrets.json') as f:
+    client_secrets = json.load(f)
 
 app = Flask(__name__)
 app.config.update({
-    'SECRET_KEY': 'uaUkCfrrEmSqf13Qkk5f4bgeLwBhMqNi',
-    'OIDC_CLIENT_SECRETS': 'client_secrets.json',
+    'SECRET_KEY': client_secrets['web']['client_secret'],
+    'OIDC_CLIENT_SECRETS': client_secrets,
     'OIDC_SCOPES': ['openid', 'email', 'profile'],
     'OIDC_INTROSPECTION_AUTH_METHOD': 'client_secret_post',
     'OIDC_USER_INFO_ENABLED': True,
@@ -34,38 +38,91 @@ class Scholarship(db.Model):
 @oidc.require_login
 def profile():
     # Get user info including access token
-    info = oidc.user_getinfo(['preferred_username', 'email', 'sub'])
+    # info = oidc.user_getinfo(['preferred_username', 'email', 'sub'])
+    info = session.get('oidc_auth_profile', {})
     
     # Get the access token from the OAuth info
     access_token = oidc.get_access_token()
     print(access_token)
     
+    if access_token:
+        token_data = jwt.decode(access_token, options={"verify_signature": False})
+        token_expiry = token_data.get('exp')  # Expiry time is in the 'exp' field (in seconds)
+    else:
+        token_expiry = None
+    
     # Make request to Keycloak userinfo endpoint using the access token
-    headers = {'Authorization': f'Bearer {access_token}'}
-    userinfo_endpoint = 'http://localhost:8080/realms/demo-sso-realm/protocol/openid-connect/userinfo'
+    # headers = {'Authorization': f'Bearer {access_token}'}
+    # userinfo_endpoint = app.config['OIDC_CLIENT_SECRETS']['web']['userinfo_uri']
     
-    try:
-        response = requests.get(userinfo_endpoint, headers=headers)
-        if response.status_code == 200:
-            userinfo = response.json()
-            # Merge userinfo with existing info
-            info.update(userinfo)
-    except requests.exceptions.RequestException as e:
-        print(f"Error fetching user info: {e}")
+    # try:
+    #     response = requests.get(userinfo_endpoint, headers=headers)
+    #     if response.status_code == 200:
+    #         userinfo = response.json()
+    #         # Merge userinfo with existing info
+    #         info.update(userinfo)
+    # except requests.exceptions.RequestException as e:
+    #     print(f"Error fetching user info: {e}")
     
-    return render_template('profile.html', info=info)
+    return render_template('profile.html', info=info, token_expiry=token_expiry, access_token=access_token, oidc=oidc)
 
-@app.route('/logout')
-def logout():
+@app.route('/logout_sso')
+def logout_sso():
     oidc.logout()
-    return redirect(url_for('home'))
+    session.clear()
+    keycloak_logout_url = app.config['OIDC_CLIENT_SECRETS']['web']['logout_uri']
+    cliend_id = app.config['OIDC_CLIENT_SECRETS']['web']['client_id']
+    return redirect(f"{keycloak_logout_url}?client_id={cliend_id}&post_logout_redirect_uri={url_for('home', _external=True)}")
 
 @app.route('/')
 def home():
-    info = oidc.user_getinfo(['email'])
-    user_email = info.get('email')
-    scholarships = Scholarship.query.filter_by(email=user_email).all()
-    return render_template('scholarships.html', scholarships=scholarships)
+    # if oidc.user_loggedin:
+    #     print("User is logged in")
+    # else:
+    #     print("User is not logged in")
+    return render_template('home.html', oidc=oidc)
+
+@app.template_filter('timestamp_to_date')
+def timestamp_to_date(timestamp):
+    if timestamp:
+        vietnam_tz = pytz.timezone('Asia/Ho_Chi_Minh')
+        dt = datetime.fromtimestamp(timestamp, tz=pytz.utc)  # Convert timestamp to UTC
+        vietnam_time = dt.astimezone(vietnam_tz)
+        return vietnam_time.strftime('%Y-%m-%d %H:%M:%S')
+    
+    return "Unknown"
+
+@app.route('/refresh_token')
+@oidc.require_login
+def refresh_token():
+    refresh_token = oidc.get_refresh_token()
+    
+    if not refresh_token:
+        return jsonify({'error': 'No refresh token available'}), 400
+
+    # Get the client credentials from the loaded client secrets
+    client_id = app.config['OIDC_CLIENT_SECRETS']['web']['client_id']
+    client_secret = app.config['OIDC_CLIENT_SECRETS']['web']['client_secret']
+    token_uri = app.config['OIDC_CLIENT_SECRETS']['web']['token_uri']
+    
+    data = {
+        'grant_type': 'refresh_token',
+        'refresh_token': refresh_token,
+        'client_id': client_id,
+        'client_secret': client_secret
+    }
+    
+    response = requests.post(token_uri, data=data)
+
+    if response.status_code == 200:
+        refreshed_token = response.json().get('access_token')
+        token_data = jwt.decode(refreshed_token, options={"verify_signature": False})
+        new_token_expiry = timestamp_to_date(token_data.get('exp'))
+        print(f"Token refreshed successfully. New expiry time: {new_token_expiry}")
+        return jsonify({'token_expiry': new_token_expiry, 'access_token': refreshed_token}), 200
+    else:
+        return jsonify({'error': 'Failed to refresh the token', 'details': response.json()}), 400
+
 
 @app.route('/scholarships')
 @oidc.require_login
@@ -73,7 +130,7 @@ def scholarships():
     info = oidc.user_getinfo(['email'])
     user_email = info.get('email')
     scholarships = Scholarship.query.filter_by(email=user_email).all()
-    return render_template('scholarships.html', scholarships=scholarships)
+    return render_template('scholarships.html', scholarships=scholarships, oidc=oidc)
 
 @app.route('/scholarship/add', methods=['GET', 'POST'])
 @oidc.require_login
@@ -94,7 +151,7 @@ def add_scholarship():
         flash('Scholarship added successfully!', 'success')
         return redirect(url_for('scholarships'))
     
-    return render_template('scholarship_form.html')
+    return render_template('scholarship_form.html', oidc=oidc)
 
 @app.route('/scholarship/edit/<int:id>', methods=['GET', 'POST'])
 @oidc.require_login
@@ -116,7 +173,7 @@ def edit_scholarship(id):
         flash('Scholarship updated successfully!', 'success')
         return redirect(url_for('scholarships'))
     
-    return render_template('scholarship_form.html', scholarship=scholarship)
+    return render_template('scholarship_form.html', scholarship=scholarship, oidc=oidc)
 
 @app.route('/scholarship/delete/<int:id>')
 @oidc.require_login
