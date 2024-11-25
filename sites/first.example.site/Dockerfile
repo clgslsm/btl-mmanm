@@ -17,13 +17,13 @@ FROM python:3.12-slim AS runner
 RUN apt update && apt upgrade -y
 RUN apt install -y nginx
 
-COPY ./nginx.conf /etc/nginx/sites-available/default
 
 COPY --from=fe-builder /app/build /var/www/first.example.site
 
+COPY ./nginx.conf /etc/nginx/sites-available/default
 WORKDIR /opt/backend
 COPY ./backend/requirements.txt ./
-RUN pip3 install -r requirements.txt
+RUN pip install -r requirements.txt
 
 COPY ./backend .
 
