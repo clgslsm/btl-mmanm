@@ -5,7 +5,7 @@
   "defaultSignatureAlgorithm": "RS256",
   "revokeRefreshToken": false,
   "refreshTokenMaxReuse": 0,
-  "accessTokenLifespan": 1800,
+  "accessTokenLifespan": 300,
   "accessTokenLifespanForImplicitFlow": 900,
   "ssoSessionIdleTimeout": 1800,
   "ssoSessionMaxLifespan": 36000,
@@ -731,6 +731,7 @@
       "clientAuthenticatorType": "client-secret",
       "secret": "**********",
       "redirectUris": [
+        "http://127.0.0.1:5000/*",
         "http://localhost:5000/*"
       ],
       "webOrigins": [
@@ -747,9 +748,9 @@
       "frontchannelLogout": true,
       "protocol": "openid-connect",
       "attributes": {
-        "client.secret.creation.time": "1731686898",
+        "client.secret.creation.time": "1732349252",
         "client.introspection.response.allow.jwt.claim.enabled": "false",
-        "post.logout.redirect.uris": "+",
+        "post.logout.redirect.uris": "http://localhost:5000/##http://127.0.0.1:5000/",
         "oauth2.device.authorization.grant.enabled": "false",
         "backchannel.logout.revoke.offline.tokens": "false",
         "use.refresh.tokens": "true",
@@ -1615,14 +1616,14 @@
         "subComponents": {},
         "config": {
           "allowed-protocol-mapper-types": [
-            "oidc-usermodel-attribute-mapper",
             "saml-user-property-mapper",
-            "oidc-address-mapper",
             "saml-role-list-mapper",
-            "oidc-usermodel-property-mapper",
+            "oidc-full-name-mapper",
+            "oidc-usermodel-attribute-mapper",
+            "oidc-address-mapper",
             "saml-user-attribute-mapper",
             "oidc-sha256-pairwise-sub-mapper",
-            "oidc-full-name-mapper"
+            "oidc-usermodel-property-mapper"
           ]
         }
       },
@@ -1658,13 +1659,13 @@
         "subComponents": {},
         "config": {
           "allowed-protocol-mapper-types": [
-            "saml-user-property-mapper",
-            "oidc-full-name-mapper",
-            "saml-user-attribute-mapper",
             "saml-role-list-mapper",
-            "oidc-usermodel-attribute-mapper",
+            "saml-user-property-mapper",
+            "saml-user-attribute-mapper",
+            "oidc-full-name-mapper",
             "oidc-usermodel-property-mapper",
             "oidc-sha256-pairwise-sub-mapper",
+            "oidc-usermodel-attribute-mapper",
             "oidc-address-mapper"
           ]
         }
@@ -1695,8 +1696,8 @@
                 "group.name.ldap.attribute": [
                   "cn"
                 ],
-                "membership.user.ldap.attribute": [
-                  "uid"
+                "ignore.missing.groups": [
+                  "false"
                 ],
                 "preserve.group.inheritance": [
                   "false"
@@ -1704,17 +1705,17 @@
                 "membership.ldap.attribute": [
                   "memberUid"
                 ],
-                "ignore.missing.groups": [
-                  "false"
+                "membership.user.ldap.attribute": [
+                  "uid"
                 ],
-                "groups.dn": [
-                  "ou=groups,dc=example,dc=com"
+                "memberof.ldap.attribute": [
+                  "inetOrgPerson"
                 ],
                 "group.object.classes": [
                   "posixGroup"
                 ],
-                "memberof.ldap.attribute": [
-                  "inetOrgPerson"
+                "groups.dn": [
+                  "ou=groups,dc=example,dc=com"
                 ],
                 "groups.path": [
                   "/"
@@ -1736,10 +1737,10 @@
                 "is.mandatory.in.ldap": [
                   "true"
                 ],
-                "always.read.value.from.ldap": [
+                "read.only": [
                   "false"
                 ],
-                "read.only": [
+                "always.read.value.from.ldap": [
                   "false"
                 ],
                 "user.model.attribute": [
@@ -1759,10 +1760,10 @@
                 "is.mandatory.in.ldap": [
                   "false"
                 ],
-                "read.only": [
+                "always.read.value.from.ldap": [
                   "true"
                 ],
-                "always.read.value.from.ldap": [
+                "read.only": [
                   "true"
                 ],
                 "user.model.attribute": [
@@ -1782,10 +1783,10 @@
                 "is.mandatory.in.ldap": [
                   "false"
                 ],
-                "always.read.value.from.ldap": [
+                "read.only": [
                   "true"
                 ],
-                "read.only": [
+                "always.read.value.from.ldap": [
                   "true"
                 ],
                 "user.model.attribute": [
@@ -1828,10 +1829,10 @@
                 "is.mandatory.in.ldap": [
                   "false"
                 ],
-                "read.only": [
+                "always.read.value.from.ldap": [
                   "false"
                 ],
-                "always.read.value.from.ldap": [
+                "read.only": [
                   "false"
                 ],
                 "user.model.attribute": [
@@ -1865,20 +1866,20 @@
           ]
         },
         "config": {
-          "fullSyncPeriod": [
-            "-1"
-          ],
           "pagination": [
             "false"
+          ],
+          "fullSyncPeriod": [
+            "-1"
           ],
           "startTls": [
             "false"
           ],
-          "connectionPooling": [
-            "false"
-          ],
           "usersDn": [
             "ou=users,dc=example,dc=com"
+          ],
+          "connectionPooling": [
+            "false"
           ],
           "cachePolicy": [
             "DEFAULT"
@@ -1895,14 +1896,14 @@
           "bindCredential": [
             "**********"
           ],
-          "changedSyncPeriod": [
-            "-1"
-          ],
           "bindDn": [
             "cn=admin,dc=example,dc=com"
           ],
           "usernameLDAPAttribute": [
             "uid"
+          ],
+          "changedSyncPeriod": [
+            "-1"
           ],
           "vendor": [
             "other"
