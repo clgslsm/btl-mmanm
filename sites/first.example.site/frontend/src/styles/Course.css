@@ -1,0 +1,48 @@
+/* Container for the course data */
+.course-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;  /* Center content inside the container */
+}
+
+/* Title styling */
+.course-title {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 20px;
+    text-align: center;  /* Center the title */
+}
+
+/* General info styling */
+.course-info {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    color: #555;
+    text-align: left;  /* Left align the course info */
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+/* Bold text within the info */
+.bold-text {
+    font-weight: bold;
+}
+
+/* Error message styling */
+.error-message {
+    color: red;
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Loading state styling */
+.loading-message {
+    text-align: center;
+    font-size: 1.5rem;
+}
+  

@@ -1,20 +1,12 @@
 from flask import Flask, request, jsonify, g
-from flask_oidc import OpenIDConnect
 import requests
 import jwt  # For decoding tokens locally
 from flasgger import Swagger  # Import Swagger
 import sqlite3, json, os
-
-client_secrets = json.load(os.getenv("CLIENT_SECRETS", "{}"))
+from flask_cors import CORS  # Import CORS
 
 app = Flask(__name__)
-app.config.update({
-    'SECRET_KEY': client_secrets['web']['client_secret'],
-    'OIDC_CLIENT_SECRETS': client_secrets,
-    'OIDC_SCOPES': ['openid', 'email', 'profile'],
-    'OIDC_INTROSPECTION_AUTH_METHOD': 'client_secret_post',
-    'OIDC_USER_INFO_ENABLED': True,
-})
+CORS(app)
 
 swagger = Swagger(app, template={
     'securityDefinitions': {
@@ -26,10 +18,7 @@ swagger = Swagger(app, template={
     }
 })  # Initialize Swagger
 
-KEYCLOAK_REALM = "demo-sso-realm"
-KEYCLOAK_SERVER = "http://localhost:8080"
-KEYCLOAK_INTROSPECTION_ENDPOINT = f"{KEYCLOAK_SERVER}/realms/{KEYCLOAK_REALM}/protocol/openid-connect/token/introspect"
-KEYCLOAK_PUBLIC_KEY_URL = f"{KEYCLOAK_SERVER}/realms/{KEYCLOAK_REALM}"
+KEYCLOAK_PUBLIC_KEY_URL = "http://localhost:8080/realms/demo-sso-realm"
 
 DATABASE = 'university.db'
 

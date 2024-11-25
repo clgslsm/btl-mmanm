@@ -35,9 +35,9 @@ services:
       - ./configs/ldap:/etc/ldap/slapd.d
     networks:
       - database
-    # ports:
-    #   - "389:389"
-    #   - "636:636"
+    ports:
+      - "389:389"
+      - "636:636"
 
 
   phpldapadmin:

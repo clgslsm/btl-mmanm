@@ -5,7 +5,9 @@ import requests
 from datetime import datetime
 import json, pytz, jwt
 import os
+from dotenv import load_dotenv
 
+# load_dotenv(dotenv_path='.env') # for testing locally
 client_secrets = json.loads(os.getenv("CLIENT_SECRETS", "{}"))
 
 app = Flask(__name__)
@@ -110,13 +112,45 @@ def refresh_token():
 def public():
     return render_template('public.html', oidc=oidc)
 
+def get_user_roles(access_token):
+    """Helper function to extract roles from access token"""
+    if not access_token:
+        return []
+    
+    try:
+        token_data = jwt.decode(access_token, options={"verify_signature": False})
+        print(token_data)
+        # Assuming roles are stored in realm_access.roles in the token
+        return token_data.get('realm_access', {}).get('roles', [])
+    except:
+        return []
+
 @app.route('/scholarships')
 @oidc.require_login
 def scholarships():
     info = oidc.user_getinfo(['email'])
     user_email = info.get('email')
-    scholarships = Scholarship.query.filter_by(email=user_email).all()
-    return render_template('scholarships.html', scholarships=scholarships, oidc=oidc)
+    
+    # Get access token and extract roles
+    access_token = oidc.get_access_token()
+    user_roles = get_user_roles(access_token)
+    
+    # Check if user is a lecturer
+    is_lecturer = 'lecturer' in user_roles
+    
+    if is_lecturer:
+        # Lecturers can see all scholarships
+        scholarships = Scholarship.query.all()
+    else:
+        # Students can only see their own scholarships
+        scholarships = Scholarship.query.filter_by(email=user_email).all()
+    
+    return render_template(
+        'scholarships.html',
+        scholarships=scholarships,
+        oidc=oidc,
+        is_lecturer=is_lecturer
+    )
 
 @app.route('/scholarship/add', methods=['GET', 'POST'])
 @oidc.require_login

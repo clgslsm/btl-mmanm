@@ -1,36 +1,25 @@
 import React, { useState, useEffect } from "react";
 import { useKeycloak } from "@react-keycloak/web";
 import { jwtDecode } from "jwt-decode"; // Use named import
-import './Profile.css'; // Import custom CSS for styling
+import './styles/Profile.css'; // Import custom CSS for styling
 
 const Profile = () => {
-  const { keycloak, initialized } = useKeycloak();
+  const { keycloak } = useKeycloak();
   const [userInfo, setUserInfo] = useState(null);
   const [accessToken, setAccessToken] = useState(null);
-  // const [tokenExpired, setTokenExpired] = useState(null);
   const [expiryTime, setExpiryTime] = useState(null);
   const [isTokenVisible, setIsTokenVisible] = useState(false); // State to track token visibility
 
   useEffect(() => {
-    if (initialized && keycloak.authenticated) {
+    if (keycloak.authenticated) {
       const decodedToken = jwtDecode(keycloak.token); // Decode the token
       setUserInfo(decodedToken);
 
       // Set the expiry time from token's exp claim (in seconds)
       const expTime = new Date(decodedToken.exp * 1000);
       setExpiryTime(expTime.toLocaleString());
-      // checkTokenExpiry(decodedToken.exp);
     }
-  }, [initialized, keycloak]);
-
-  // const checkTokenExpiry = (expTime) => {
-  //   const currentTime = Math.floor(Date.now() / 1000); // Get current time in seconds
-  //   if (expTime < currentTime) {
-  //     setTokenExpired("Token expired");
-  //   } else {
-  //     setTokenExpired(`Token expires at ${new Date(expTime * 1000).toLocaleString()}`);
-  //   }
-  // };
+  }, [keycloak]);
 
   const handleShowToken = () => {
     setIsTokenVisible(!isTokenVisible); // Toggle the token visibility
@@ -42,7 +31,7 @@ const Profile = () => {
   };
 
   const handleUpdateToken = () => {
-    keycloak.updateToken(120).then((refreshed) => {
+    keycloak.updateToken(600).then((refreshed) => {
       if (refreshed) {
         setAccessToken(keycloak.token); // Update the access token after refresh
         const updatedDecoded = jwtDecode(keycloak.token); // Decode the refreshed token
@@ -54,21 +43,6 @@ const Profile = () => {
         alert(error);
     });
   };
-  
-
-  if (!initialized) {
-    return <p>Loading...</p>;
-  }
-
-  if (!keycloak.authenticated) {
-    return (
-      <div className="container">
-        <h1>Welcome to React App</h1>
-        <p>Please login to see more.</p>
-        <button onClick={() => keycloak.login()} className="button">Login</button>
-      </div>
-    );
-  }
 
   return (
     <div className="container">
@@ -99,8 +73,6 @@ const Profile = () => {
 
         <button onClick={handleUpdateToken} className="button">Update Token</button>
       </div>
-
-      <button onClick={() => keycloak.logout()} className="button logout-button">Logout</button>
     </div>
   );
 };

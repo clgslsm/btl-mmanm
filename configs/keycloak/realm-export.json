@@ -69,6 +69,24 @@
         "attributes": {}
       },
       {
+        "id": "ed99699a-60e3-473e-98f0-7758b3fb0b10",
+        "name": "student",
+        "description": "",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "74e8da7d-e4f3-48a9-ab44-a15c855cf479",
+        "attributes": {}
+      },
+      {
+        "id": "8522fa35-1f72-4132-a357-d4d7f0e08006",
+        "name": "lecturer",
+        "description": "",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "74e8da7d-e4f3-48a9-ab44-a15c855cf479",
+        "attributes": {}
+      },
+      {
         "id": "be15e398-4469-4d38-85fc-a982c7fbd6fc",
         "name": "offline_access",
         "description": "${role_offline-access}",
@@ -442,7 +460,9 @@
       "path": "/lecturer",
       "subGroups": [],
       "attributes": {},
-      "realmRoles": [],
+      "realmRoles": [
+        "lecturer"
+      ],
       "clientRoles": {}
     },
     {
@@ -451,7 +471,9 @@
       "path": "/student",
       "subGroups": [],
       "attributes": {},
-      "realmRoles": [],
+      "realmRoles": [
+        "student"
+      ],
       "clientRoles": {
         "react-app": [
           "Student"
@@ -748,7 +770,7 @@
       "frontchannelLogout": true,
       "protocol": "openid-connect",
       "attributes": {
-        "client.secret.creation.time": "1732349252",
+        "client.secret.creation.time": "1732529463",
         "client.introspection.response.allow.jwt.claim.enabled": "false",
         "post.logout.redirect.uris": "http://localhost:5000/##http://127.0.0.1:5000/",
         "oauth2.device.authorization.grant.enabled": "false",
@@ -815,7 +837,6 @@
         "realm_client": "false",
         "oidc.ciba.grant.enabled": "false",
         "backchannel.logout.session.required": "true",
-        "post.logout.redirect.uris": "+",
         "oauth2.device.authorization.grant.enabled": "false",
         "display.on.consent.screen": "false",
         "backchannel.logout.revoke.offline.tokens": "false"
@@ -1616,14 +1637,14 @@
         "subComponents": {},
         "config": {
           "allowed-protocol-mapper-types": [
-            "saml-user-property-mapper",
-            "saml-role-list-mapper",
-            "oidc-full-name-mapper",
-            "oidc-usermodel-attribute-mapper",
-            "oidc-address-mapper",
             "saml-user-attribute-mapper",
+            "oidc-address-mapper",
+            "oidc-usermodel-property-mapper",
+            "oidc-full-name-mapper",
+            "saml-user-property-mapper",
             "oidc-sha256-pairwise-sub-mapper",
-            "oidc-usermodel-property-mapper"
+            "saml-role-list-mapper",
+            "oidc-usermodel-attribute-mapper"
           ]
         }
       },
@@ -1659,14 +1680,14 @@
         "subComponents": {},
         "config": {
           "allowed-protocol-mapper-types": [
-            "saml-role-list-mapper",
             "saml-user-property-mapper",
+            "saml-role-list-mapper",
             "saml-user-attribute-mapper",
+            "oidc-usermodel-attribute-mapper",
+            "oidc-address-mapper",
             "oidc-full-name-mapper",
             "oidc-usermodel-property-mapper",
-            "oidc-sha256-pairwise-sub-mapper",
-            "oidc-usermodel-attribute-mapper",
-            "oidc-address-mapper"
+            "oidc-sha256-pairwise-sub-mapper"
           ]
         }
       }
@@ -1696,26 +1717,26 @@
                 "group.name.ldap.attribute": [
                   "cn"
                 ],
-                "ignore.missing.groups": [
-                  "false"
-                ],
-                "preserve.group.inheritance": [
-                  "false"
-                ],
                 "membership.ldap.attribute": [
                   "memberUid"
                 ],
                 "membership.user.ldap.attribute": [
                   "uid"
                 ],
+                "ignore.missing.groups": [
+                  "false"
+                ],
+                "preserve.group.inheritance": [
+                  "false"
+                ],
+                "groups.dn": [
+                  "ou=groups,dc=example,dc=org"
+                ],
                 "memberof.ldap.attribute": [
                   "inetOrgPerson"
                 ],
                 "group.object.classes": [
                   "posixGroup"
-                ],
-                "groups.dn": [
-                  "ou=groups,dc=example,dc=com"
                 ],
                 "groups.path": [
                   "/"
@@ -1783,10 +1804,10 @@
                 "is.mandatory.in.ldap": [
                   "false"
                 ],
-                "read.only": [
+                "always.read.value.from.ldap": [
                   "true"
                 ],
-                "always.read.value.from.ldap": [
+                "read.only": [
                   "true"
                 ],
                 "user.model.attribute": [
@@ -1806,11 +1827,11 @@
                 "is.mandatory.in.ldap": [
                   "true"
                 ],
-                "always.read.value.from.ldap": [
-                  "true"
-                ],
                 "read.only": [
                   "false"
+                ],
+                "always.read.value.from.ldap": [
+                  "true"
                 ],
                 "user.model.attribute": [
                   "lastName"
@@ -1829,10 +1850,10 @@
                 "is.mandatory.in.ldap": [
                   "false"
                 ],
-                "always.read.value.from.ldap": [
+                "read.only": [
                   "false"
                 ],
-                "read.only": [
+                "always.read.value.from.ldap": [
                   "false"
                 ],
                 "user.model.attribute": [
@@ -1852,11 +1873,11 @@
                 "is.mandatory.in.ldap": [
                   "true"
                 ],
-                "read.only": [
-                  "false"
-                ],
                 "always.read.value.from.ldap": [
                   "true"
+                ],
+                "read.only": [
+                  "false"
                 ],
                 "user.model.attribute": [
                   "firstName"
@@ -1866,20 +1887,20 @@
           ]
         },
         "config": {
-          "pagination": [
-            "false"
-          ],
           "fullSyncPeriod": [
             "-1"
+          ],
+          "pagination": [
+            "false"
           ],
           "startTls": [
             "false"
           ],
-          "usersDn": [
-            "ou=users,dc=example,dc=com"
-          ],
           "connectionPooling": [
             "false"
+          ],
+          "usersDn": [
+            "ou=users,dc=example,dc=org"
           ],
           "cachePolicy": [
             "DEFAULT"
@@ -1893,17 +1914,17 @@
           "enabled": [
             "true"
           ],
-          "bindCredential": [
-            "**********"
-          ],
           "bindDn": [
-            "cn=admin,dc=example,dc=com"
+            "cn=admin,dc=example,dc=org"
+          ],
+          "changedSyncPeriod": [
+            "-1"
           ],
           "usernameLDAPAttribute": [
             "uid"
           ],
-          "changedSyncPeriod": [
-            "-1"
+          "bindCredential": [
+            "**********"
           ],
           "vendor": [
             "other"
@@ -1911,11 +1932,11 @@
           "uuidLDAPAttribute": [
             "entryUUID"
           ],
-          "connectionUrl": [
-            "ldap://host.docker.internal:389"
-          ],
           "allowKerberosAuthentication": [
             "false"
+          ],
+          "connectionUrl": [
+            "ldap://openldap:389"
           ],
           "syncRegistrations": [
             "true"
@@ -1927,7 +1948,7 @@
             "krb5PrincipalName"
           ],
           "searchScope": [
-            "1"
+            "2"
           ],
           "useTruststoreSpi": [
             "always"
@@ -1939,7 +1960,7 @@
             "false"
           ],
           "userObjectClasses": [
-            "inetOrgPerson, organizationalPerson"
+            "inetOrgPerson"
           ],
           "rdnLDAPAttribute": [
             "uid"

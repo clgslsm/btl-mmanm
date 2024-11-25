@@ -1,23 +1,33 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>My Scholarships</h2>
-<a href="{{ url_for('add_scholarship') }}" class="btn btn-primary mb-3">Add New Scholarship</a>
+<h1>Scholarships</h1>
 
-<div class="row">
+{% if is_lecturer %}
+    <div class="alert alert-info">
+        Viewing all scholarships (Lecturer View)
+    </div>
+{% endif %}
+
+<div class="scholarship-list">
     {% for scholarship in scholarships %}
-    <div class="col-md-4 mb-3">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">{{ scholarship.title }}</h5>
-                <h6 class="card-subtitle mb-2 text-muted">${{ "%.2f"|format(scholarship.amount) }}</h6>
-                <p class="card-text">{{ scholarship.description }}</p>
-                <p class="card-text"><small class="text-muted">Deadline: {{ scholarship.deadline.strftime('%Y-%m-%d') }}</small></p>
-                <a href="{{ url_for('edit_scholarship', id=scholarship.id) }}" class="btn btn-sm btn-primary">Edit</a>
-                <a href="{{ url_for('delete_scholarship', id=scholarship.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
-            </div>
-        </div>
+    <div class="scholarship-item">
+        <h3>{{ scholarship.title }}</h3>
+        <p>Amount: ${{ scholarship.amount }}</p>
+        <p>Deadline: {{ scholarship.deadline.strftime('%Y-%m-%d') }}</p>
+        <p>Submitted by: {{ scholarship.email }}</p>
+        
+        {% if not is_lecturer %}
+            <!-- Show edit/delete buttons only for students (for their own scholarships) -->
+            <a href="{{ url_for('edit_scholarship', id=scholarship.id) }}" class="btn btn-primary">Edit</a>
+            <a href="{{ url_for('delete_scholarship', id=scholarship.id) }}" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+        {% endif %}
     </div>
     {% endfor %}
 </div>
+
+{% if not is_lecturer %}
+    <!-- Show Add New button only for students -->
+    <a href="{{ url_for('add_scholarship') }}" class="btn btn-success">Add New Scholarship</a>
+{% endif %}
 {% endblock %}
