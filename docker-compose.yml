@@ -6,17 +6,23 @@ services:
     environment:
       - KEYCLOAK_ADMIN=${KC_ADMIN_USERNAME:-admin}
       - KEYCLOAK_ADMIN_PASSWORD=${KC_ADMIN_PASSWD:-admin}
-      - KC_HOSTNAME_STRICT=false
-      - KC_HOSTNAME_STRICT_HTTPS=false
-      - KC_HEALTH_ENABLED=true
+      - KC_HOSTNAME_STRICT_HTTPS=true
+      - KC_CERTIFICATE_FILE=/opt/keycloak/cert/certificate.crt
+      - KC_PRIVATE_KEY_FILE=/opt/keycloak/cert/private.key
+      - KC_HTTPS_PROTOCOLS=TLSv1.2,TLSv1.3
+      - KC_HTTPS_PORT=443
     ports:
-      - "8080:8080"
+      - "8443:443"
     volumes:
       - ./configs/keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json
+      - ./configs/nginx/ssl/sso.example.org:/opt/keycloak/cert
     command:
-      - start-dev
+      - start
       - --import-realm
-      - --health-enabled=true
+      - --hostname=${KC_HOSTNAME:-sso.example.org}
+      - --https-port=${KC_HTTPS_PORT:-443}
+      - --https-certificate-file=/opt/keycloak/cert/certificate.crt
+      - --https-certificate-key-file=/opt/keycloak/cert/private.key
     depends_on:
       - openldap
     networks:
@@ -25,7 +31,6 @@ services:
 
   openldap:
     image: osixia/openldap:latest
-    container_name: openldap
     environment:
       - LDAP_ORGANISATION=${LDAP_ORG:-ExampleOrg}
       - LDAP_DOMAIN=${LDAP_DOMAIN:-example.org}
@@ -39,10 +44,8 @@ services:
       - "389:389"
       - "636:636"
 
-
   phpldapadmin:
     image: osixia/phpldapadmin:latest
-    container_name: phpldapadmin
     environment:
       - PHPLDAPADMIN_LDAP_HOSTS=openldap
     ports:
@@ -51,6 +54,45 @@ services:
       - openldap
     networks:
       - database
+
+  first-app:
+    build: ./sites/first.example.site
+    restart: unless-stopped
+    networks:
+      - deploy
+    extra_hosts:
+      - "sso.example.org:host-gateway"
+    volumes:
+      - ./configs/nginx/ssl/sso.example.org/certificate.crt:/etc/ssl/certs/sso.example.org.crt
+    environment:
+      - REQUESTS_CA_BUNDLE=/etc/ssl/certs/sso.example.org.crt
+
+  second-app:
+    build: ./sites/second.example.site
+    restart: unless-stopped
+    networks:
+      - deploy
+    extra_hosts:
+      - "sso.example.org:host-gateway"
+    volumes:
+      - ./configs/nginx/ssl/sso.example.org/certificate.crt:/etc/ssl/certs/sso.example.org.crt
+    environment:
+      - REQUESTS_CA_BUNDLE=/etc/ssl/certs/sso.example.org.crt
+  reverse-proxy:
+    image: nginx:latest
+    volumes:
+      - ./configs/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./configs/nginx/sites-available:/etc/nginx/sites-available
+      - ./configs/nginx/ssl:/etc/nginx/ssl
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - keycloak
+      - first-app
+      - second-app
+    networks:
+      - deploy
 
 volumes:
   ldap_data:

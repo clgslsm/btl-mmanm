@@ -1,7 +1,6 @@
-# flask-oidc
 flask-oidc
-# flask
 flask
-
-# requests
 requests
+flasgger
+PyJWT
+flask_cors

@@ -744,7 +744,7 @@
       "clientId": "flask-app",
       "name": "",
       "description": "",
-      "rootUrl": "http://localhost:5000",
+      "rootUrl": "http://second.example.org",
       "adminUrl": "",
       "baseUrl": "",
       "surrogateAuthRequired": false,
@@ -754,10 +754,10 @@
       "secret": "**********",
       "redirectUris": [
         "http://127.0.0.1:5000/*",
-        "http://localhost:5000/*"
+        "http://second.example.org/*"
       ],
       "webOrigins": [
-        "http://localhost:5000"
+        "http://second.example.org"
       ],
       "notBefore": 0,
       "bearerOnly": false,
@@ -772,7 +772,7 @@
       "attributes": {
         "client.secret.creation.time": "1732529463",
         "client.introspection.response.allow.jwt.claim.enabled": "false",
-        "post.logout.redirect.uris": "http://localhost:5000/##http://127.0.0.1:5000/",
+        "post.logout.redirect.uris": "http://second.example.org/##http://127.0.0.1:5000/",
         "oauth2.device.authorization.grant.enabled": "false",
         "backchannel.logout.revoke.offline.tokens": "false",
         "use.refresh.tokens": "true",
