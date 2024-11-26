@@ -810,7 +810,7 @@
       "clientId": "react-app",
       "name": "",
       "description": "",
-      "rootUrl": "http://localhost:3000",
+      "rootUrl": "https://first.example.org",
       "adminUrl": "",
       "baseUrl": "",
       "surrogateAuthRequired": false,
@@ -818,10 +818,10 @@
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "redirectUris": [
-        "http://localhost:3000/*"
+        "https://first.example.org/*"
       ],
       "webOrigins": [
-        "http://localhost:3000"
+        "https://first.example.org"
       ],
       "notBefore": 0,
       "bearerOnly": false,

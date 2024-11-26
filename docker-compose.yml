@@ -11,6 +11,7 @@ services:
       - KC_PRIVATE_KEY_FILE=/opt/keycloak/cert/private.key
       - KC_HTTPS_PROTOCOLS=TLSv1.2,TLSv1.3
       - KC_HTTPS_PORT=443
+      - KC_PROXY=edge
     ports:
       - "8443:443"
     volumes:
@@ -36,7 +37,7 @@ services:
       - LDAP_DOMAIN=${LDAP_DOMAIN:-example.org}
       - LDAP_ADMIN_PASSWORD=${LDAP_ADMIN_PASSWORD:-admin}
     volumes:
-      - ldap_data:/var/lib/ldap
+      - ./ldap_data:/var/lib/ldap
       - ./configs/ldap:/etc/ldap/slapd.d
     networks:
       - database
@@ -62,10 +63,6 @@ services:
       - deploy
     extra_hosts:
       - "sso.example.org:host-gateway"
-    volumes:
-      - ./configs/nginx/ssl/sso.example.org/certificate.crt:/etc/ssl/certs/sso.example.org.crt
-    environment:
-      - REQUESTS_CA_BUNDLE=/etc/ssl/certs/sso.example.org.crt
 
   second-app:
     build: ./sites/second.example.site
@@ -74,10 +71,6 @@ services:
       - deploy
     extra_hosts:
       - "sso.example.org:host-gateway"
-    volumes:
-      - ./configs/nginx/ssl/sso.example.org/certificate.crt:/etc/ssl/certs/sso.example.org.crt
-    environment:
-      - REQUESTS_CA_BUNDLE=/etc/ssl/certs/sso.example.org.crt
   reverse-proxy:
     image: nginx:latest
     volumes:
@@ -93,9 +86,6 @@ services:
       - second-app
     networks:
       - deploy
-
-volumes:
-  ldap_data:
 
 networks:
   deploy:
