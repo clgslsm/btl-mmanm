@@ -1,0 +1,6 @@
+flask-oidc
+flask
+requests
+flasgger
+PyJWT
+flask_cors

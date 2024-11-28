@@ -1,0 +1,7 @@
+flask-oidc
+flask
+requests
+flask_sqlalchemy
+pytz
+PyJWT
+python-dotenv

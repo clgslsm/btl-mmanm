@@ -1,12 +1,9 @@
-## Hướng dẫn cài đặt
-
-Import realm-export.json vào Keycloak
-
-Để run project flask, cd vào thư mục flask-sso-app, run `python app.py`
-
-Để run project react, cd vào thư mục react-sso-app, run:
+Add below domains to hosts file:
 
 ```
-npm install
-npm run start
+sso.example.org 127.0.0.1
+first.example.org 127.0.0.1
+second.example.org 127.0.0.1
 ```
+
+In Linux, the hosts file is located at /etc/hosts. In Windows, it is located at C:\Windows\System32\drivers\etc\hosts. You need to have administrative privileges to edit the hosts file.

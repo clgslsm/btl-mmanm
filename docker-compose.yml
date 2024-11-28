@@ -1,50 +1,94 @@
-version: '3'
+name: sso_demo
 
 services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    environment:
+      - KEYCLOAK_ADMIN=${KC_ADMIN_USERNAME:-admin}
+      - KEYCLOAK_ADMIN_PASSWORD=${KC_ADMIN_PASSWD:-admin}
+      - KC_HOSTNAME_STRICT_HTTPS=true
+      - KC_CERTIFICATE_FILE=/opt/keycloak/cert/certificate.crt
+      - KC_PRIVATE_KEY_FILE=/opt/keycloak/cert/private.key
+      - KC_HTTPS_PROTOCOLS=TLSv1.2,TLSv1.3
+      - KC_HTTPS_PORT=443
+      - KC_PROXY=edge
+    ports:
+      - "8443:443"
+    volumes:
+      - ./configs/keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json
+      - ./configs/nginx/ssl/sso.example.org:/opt/keycloak/cert
+    command:
+      - start
+      - --import-realm
+      - --hostname=${KC_HOSTNAME:-sso.example.org}
+      - --https-port=${KC_HTTPS_PORT:-443}
+      - --https-certificate-file=/opt/keycloak/cert/certificate.crt
+      - --https-certificate-key-file=/opt/keycloak/cert/private.key
+    depends_on:
+      - openldap
+    networks:
+      - deploy
+      - database
+
   openldap:
     image: osixia/openldap:latest
-    container_name: openldap
     environment:
-      - LDAP_ORGANISATION=ExampleCorp
-      - LDAP_DOMAIN=example.com
-      - LDAP_ADMIN_PASSWORD=admin_password
+      - LDAP_ORGANISATION=${LDAP_ORG:-ExampleOrg}
+      - LDAP_DOMAIN=${LDAP_DOMAIN:-example.org}
+      - LDAP_ADMIN_PASSWORD=${LDAP_ADMIN_PASSWORD:-admin}
+    volumes:
+      - ./ldap_data:/var/lib/ldap
+      - ./configs/ldap:/etc/ldap/slapd.d
+    networks:
+      - database
     ports:
       - "389:389"
       - "636:636"
-    volumes:
-      - ldap_data:/var/lib/ldap
-      - ldap_config:/etc/ldap/slapd.d
 
   phpldapadmin:
     image: osixia/phpldapadmin:latest
-    container_name: phpldapadmin
     environment:
       - PHPLDAPADMIN_LDAP_HOSTS=openldap
     ports:
       - "6443:443"
     depends_on:
       - openldap
+    networks:
+      - database
 
-  keycloak:
-    image: quay.io/keycloak/keycloak:latest
-    container_name: keycloak
-    environment:
-      - KEYCLOAK_ADMIN=admin
-      - KEYCLOAK_ADMIN_PASSWORD=admin
-      - KC_HEALTH_ENABLED=true
-      # For LDAP integration
-      - KC_HOSTNAME_STRICT=false
-      - KC_HOSTNAME_STRICT_HTTPS=false
-    ports:
-      - "8080:8080"
+  first-app:
+    build: ./sites/first.example.site
+    restart: unless-stopped
+    networks:
+      - deploy
+    extra_hosts:
+      - "sso.example.org:host-gateway"
+
+  second-app:
+    build: ./sites/second.example.site
+    restart: unless-stopped
+    networks:
+      - deploy
+    extra_hosts:
+      - "sso.example.org:host-gateway"
+  reverse-proxy:
+    image: nginx:latest
     volumes:
-      - ./realm-export.json:/opt/keycloak/data/import/realm-export.json
-    command:
-      - start-dev
-      - --import-realm
-      - --health-enabled=true
+      - ./configs/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./configs/nginx/sites-available:/etc/nginx/sites-available
+      - ./configs/nginx/ssl:/etc/nginx/ssl
+    ports:
+      - "80:80"
+      - "443:443"
     depends_on:
-      - openldap
-volumes:
-  ldap_data:
-  ldap_config:
+      - keycloak
+      - first-app
+      - second-app
+    networks:
+      - deploy
+
+networks:
+  deploy:
+    driver: bridge
+  database:
+    driver: bridge

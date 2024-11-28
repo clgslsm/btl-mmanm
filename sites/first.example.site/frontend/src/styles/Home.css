@@ -1,0 +1,67 @@
+/* General Container Styling */
+.home-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 80vh;
+    padding: 20px;
+    text-align: center;
+    background-color: #f9f9f9;
+  }
+  
+  /* Title Styling */
+  .home-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
+  }
+  
+  /* Subtitle Styling */
+  .home-subtitle {
+    font-size: 1.2rem;
+    color: #555;
+    margin-bottom: 20px;
+  }
+  
+  /* Button Container */
+  .home-buttons {
+    display: flex;
+    gap: 15px; /* Space between buttons */
+    flex-wrap: wrap; /* Buttons will wrap if there are too many */
+  }
+  
+  /* Buttons Styling */
+  .home-button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  .home-button:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+  }
+  
+  .home-button:focus {
+    outline: none;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 600px) {
+    .home-title {
+      font-size: 2rem;
+    }
+  
+    .home-button {
+      padding: 8px 15px;
+      font-size: 0.9rem;
+    }
+  }
+  
