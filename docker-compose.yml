@@ -71,6 +71,7 @@ services:
       - deploy
     extra_hosts:
       - "sso.example.org:host-gateway"
+      
   reverse-proxy:
     image: nginx:latest
     volumes:

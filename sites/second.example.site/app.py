@@ -12,7 +12,7 @@ from flask_oidc import OpenIDConnect
 from flask_sqlalchemy import SQLAlchemy
 import requests
 from datetime import datetime
-import json, pytz, jwt
+import pytz, jwt, json
 import os
 
 client_secrets = json.load(open("client_secrets.json"))
@@ -25,6 +25,7 @@ app.config.update(
         "OIDC_SCOPES": ["openid", "email", "profile"],
         "OIDC_INTROSPECTION_AUTH_METHOD": "client_secret_post",
         "OIDC_USER_INFO_ENABLED": True,
+        # "OVERWRITE_REDIRECT_URI": "http://second.example.org/authorize",
     }
 )
 oidc = OpenIDConnect(app)
@@ -257,4 +258,4 @@ with app.app_context():
     db.create_all()
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000, ssl_context="adhoc")
+    app.run(debug=True, port=5000)
