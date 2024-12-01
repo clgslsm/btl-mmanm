@@ -1,5 +1,5 @@
 # AUTO-GENERATED FILE - DO NOT EDIT!! Use ldapmodify.
-# CRC32 d25eff62
+# CRC32 d32afbc7
 dn: olcDatabase={0}config
 objectClass: olcDatabaseConfig
 olcDatabase: {0}config
@@ -10,7 +10,7 @@ structuralObjectClass: olcDatabaseConfig
 entryUUID: 34222f4e-401b-103f-8184-cdaeb51115fd
 creatorsName: cn=config
 createTimestamp: 20241126082139Z
-olcRootPW:: e1NTSEF9S252ajQ0bWR5UmJINkNqRThkaEltMEpBdGFXcHlOVjk=
-entryCSN: 20241130044209.985548Z#000000#000#000000
+olcRootPW:: e1NTSEF9akNuSG90djI1TzNZKzRmSHhVbWU3OS8vQWppR3J6Vnk=
+entryCSN: 20241201041415.419629Z#000000#000#000000
 modifiersName: gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth
-modifyTimestamp: 20241130044209Z
+modifyTimestamp: 20241201041415Z
