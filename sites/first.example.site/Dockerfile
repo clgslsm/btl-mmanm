@@ -15,8 +15,11 @@ RUN npm run build
 FROM python:3.12-slim AS runner
 
 RUN apt update && apt upgrade -y
-RUN apt install -y nginx
+RUN apt install -y nginx ca-certificates
 
+COPY sso.crt /usr/local/share/ca-certificates/sso.example.org.crt
+
+RUN update-ca-certificates
 
 COPY --from=fe-builder /app/build /var/www/first.example.site
 
@@ -30,5 +33,5 @@ COPY ./backend .
 WORKDIR /
 COPY ./entrypoint.sh .
 RUN chmod +x entrypoint.sh
-
+ENV REQUESTS_CA_BUNDLE=/etc/ssl/certs/sso.example.org.pem
 ENTRYPOINT ["/entrypoint.sh"]

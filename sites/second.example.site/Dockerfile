@@ -1,7 +1,7 @@
 FROM python:3.10-slim
 
 RUN apt update && apt upgrade -y
-RUN apt install ca-certificates
+RUN apt install -y ca-certificates
 
 COPY sso.crt /usr/local/share/ca-certificates/sso.example.org.crt
 
