@@ -25,6 +25,12 @@ app.config.update(
         "OIDC_SCOPES": ["openid", "email", "profile"],
         "OIDC_INTROSPECTION_AUTH_METHOD": "client_secret_post",
         "OIDC_USER_INFO_ENABLED": True,
+        "OIDC_CALLBACK_ROUTE": "/oidc/callback",
+        "OIDC_ID_TOKEN_COOKIE_SECURE": False,
+        "OIDC_REQUIRE_VERIFIED_EMAIL": False,
+        "OIDC_TOKEN_TYPE_HINT": "access_token",
+        "OIDC_CLOCK_SKEW": 560,
+        "OIDC_COOKIE_SECURE": False,
     }
 )
 oidc = OpenIDConnect(app)
@@ -103,6 +109,8 @@ def timestamp_to_date(timestamp):
 @app.route("/refresh_token")
 @oidc.require_login
 def refresh_token():
+    if not oidc.user_loggedin:
+        return redirect(url_for("home"))
     refresh_token = oidc.get_refresh_token()
 
     if not refresh_token:
@@ -164,6 +172,8 @@ def get_user_roles(access_token):
 @app.route("/scholarships")
 @oidc.require_login
 def scholarships():
+    if not oidc.user_loggedin:
+        return redirect(url_for("home"))
     info = oidc.user_getinfo(["email"])
     user_email = info.get("email")
 
@@ -192,6 +202,8 @@ def scholarships():
 @app.route("/scholarship/add", methods=["GET", "POST"])
 @oidc.require_login
 def add_scholarship():
+    if not oidc.user_loggedin:
+        return redirect(url_for("home"))
     if request.method == "POST":
         info = oidc.user_getinfo(["email"])
         user_email = info.get("email")
