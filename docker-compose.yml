@@ -29,6 +29,11 @@ services:
     networks:
       - deploy
       - database
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f",  "https://localhost:8443/realms/demo-sso-realm"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
 
   openldap:
     image: osixia/openldap:latest
@@ -63,6 +68,9 @@ services:
       - deploy
     extra_hosts:
       - "sso.example.org:host-gateway"
+    # depends_on:
+    #   keycloak:
+    #     condition: service_healthy
 
   second-app:
     build: ./sites/second.example.site
@@ -71,6 +79,9 @@ services:
       - deploy
     extra_hosts:
       - "sso.example.org:host-gateway"
+    # depends_on:
+    #   keycloak:
+    #     condition: service_healthy
 
   reverse-proxy:
     image: nginx:latest
