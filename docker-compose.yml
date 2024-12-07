@@ -7,8 +7,8 @@ services:
       - KEYCLOAK_ADMIN=${KC_ADMIN_USERNAME:-admin}
       - KEYCLOAK_ADMIN_PASSWORD=${KC_ADMIN_PASSWD:-admin}
       - KC_HOSTNAME_STRICT_HTTPS=true
-      - KC_CERTIFICATE_FILE=/opt/keycloak/cert/certificate.crt
-      - KC_PRIVATE_KEY_FILE=/opt/keycloak/cert/private.key
+      - KC_CERTIFICATE_FILE=/opt/keycloak/cert/server.crt
+      - KC_PRIVATE_KEY_FILE=/opt/keycloak/cert/server.key
       - KC_HTTPS_PROTOCOLS=TLSv1.2,TLSv1.3
       - KC_HTTPS_PORT=443
       - KC_PROXY=edge
@@ -22,8 +22,8 @@ services:
       - --import-realm
       - --hostname=${KC_HOSTNAME:-sso.example.org}
       - --https-port=${KC_HTTPS_PORT:-443}
-      - --https-certificate-file=/opt/keycloak/cert/certificate.crt
-      - --https-certificate-key-file=/opt/keycloak/cert/private.key
+      - --https-certificate-file=/opt/keycloak/cert/server.crt
+      - --https-certificate-key-file=/opt/keycloak/cert/server.key
     depends_on:
       - openldap
     networks:
@@ -71,6 +71,7 @@ services:
       - deploy
     extra_hosts:
       - "sso.example.org:host-gateway"
+
   reverse-proxy:
     image: nginx:latest
     volumes:

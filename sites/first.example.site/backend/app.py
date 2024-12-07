@@ -31,7 +31,7 @@ swagger = Swagger(
     },
 )  # Initialize Swagger
 
-KEYCLOAK_PUBLIC_KEY_URL = "http://keycloak:8080/realms/demo-sso-realm"
+KEYCLOAK_PUBLIC_KEY_URL = "https://sso.example.org/realms/demo-sso-realm"
 
 DATABASE = "university.db"
 
@@ -86,7 +86,7 @@ init_db()
 
 def get_keycloak_public_key():
     try:
-        response = requests.get(f"{KEYCLOAK_PUBLIC_KEY_URL}")
+        response = requests.get(f"{KEYCLOAK_PUBLIC_KEY_URL}", verify=False)
         response.raise_for_status()
         key_data = response.json()
         # Format the public key properly
