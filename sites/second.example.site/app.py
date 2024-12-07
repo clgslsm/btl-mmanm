@@ -20,24 +20,21 @@ client_secrets = json.load(open("client_secrets.json"))
 app = Flask(__name__)
 app.config.update(
     {
-        "SECRET_KEY": client_secrets["web"]["client_secret"],
+        "SECRET_KEY": os.environ.get("FLASK_SECRET_KEY", os.urandom(24)),
         "OIDC_CLIENT_SECRETS": client_secrets,
         "OIDC_SCOPES": ["openid", "email", "profile"],
         "OIDC_INTROSPECTION_AUTH_METHOD": "client_secret_post",
         "OIDC_USER_INFO_ENABLED": True,
-        # "OVERWRITE_REDIRECT_URI": "http://second.example.org/authorize",
     }
 )
 oidc = OpenIDConnect(app)
 
-# Add SQLAlchemy config
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///scholarships.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
 
-# Add Scholarship Model
 class Scholarship(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), nullable=False)

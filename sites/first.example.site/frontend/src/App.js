@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { ReactKeycloakProvider } from "@react-keycloak/web";
-import keycloak from "./keycloak";
+import keycloakClient from "./keycloak";
 import Home from "./Home";
 import Course from "./Course";
 import Profile from "./Profile";
@@ -26,10 +26,9 @@ const PrivateRoute = ({ children }) => {
 
   return children;
 };
-
 function App() {
   return (
-    <ReactKeycloakProvider authClient={keycloak}>
+    <ReactKeycloakProvider authClient={keycloakClient}>
       <Router>
         <Navbar />
         <Routes>

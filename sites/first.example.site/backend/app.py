@@ -8,8 +8,6 @@ from flask_cors import CORS  # Import CORS
 app = Flask(__name__)
 CORS(app)
 
-app.config["APPLICATION_ROOT"] = "/api"
-
 client_secrets = json.load(open("client_secrets.json"))
 
 app.config.update(

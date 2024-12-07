@@ -19,7 +19,7 @@ const Course = () => {
           return;
         }
 
-        const response = await fetch("http://localhost:5001/api/resource", {
+        const response = await fetch("/api/resource", {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`,
