@@ -27,7 +27,6 @@ app.config.update(
         "OIDC_USER_INFO_ENABLED": True,
         "OIDC_CALLBACK_ROUTE": "/oidc/callback",
         "OIDC_ID_TOKEN_COOKIE_SECURE": False,
-        "OIDC_REQUIRE_VERIFIED_EMAIL": False,
         "OIDC_TOKEN_TYPE_HINT": "access_token",
         "OIDC_CLOCK_SKEW": 560,
         "OIDC_COOKIE_SECURE": False,
