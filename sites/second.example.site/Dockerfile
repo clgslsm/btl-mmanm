@@ -1,4 +1,4 @@
-FROM python:3.10-slim
+FROM python:3.12-slim
 
 RUN apt update && apt upgrade -y
 RUN apt install -y ca-certificates
@@ -14,7 +14,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-ENV REQUESTS_CA_BUNDLE=/etc/ssl/certs/sso.example.org.pem
 EXPOSE 5000
-
+RUN cat /usr/local/share/ca-certificates/sso.example.org.crt | tee -a /usr/local/lib/python3.12/site-packages/certifi/cacert.pem
 CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]
