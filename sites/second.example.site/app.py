@@ -49,6 +49,12 @@ class Scholarship(db.Model):
     deadline = db.Column(db.DateTime)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+@app.route("/")
+def home():
+    print('check_login:', oidc.user_loggedin)
+    # if not oidc.user_loggedin:
+    #     session.clear() # Clear the session to remove any stale data
+    return render_template("home.html", oidc=oidc)
 
 @app.route("/profile")
 @oidc.require_login
@@ -87,11 +93,6 @@ def logout_sso():
     return redirect(
         f"{keycloak_logout_url}?client_id={cliend_id}&post_logout_redirect_uri={url_for('home', _external=True)}"
     )
-
-
-@app.route("/")
-def home():
-    return render_template("home.html", oidc=oidc)
 
 
 @app.template_filter("timestamp_to_date")

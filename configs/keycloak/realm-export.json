@@ -53,10 +53,6 @@
         "description": "${role_default-roles}",
         "composite": true,
         "composites": {
-          "realm": [
-            "offline_access",
-            "uma_authorization"
-          ],
           "client": {
             "account": [
               "view-profile",
@@ -85,38 +81,9 @@
         "clientRole": false,
         "containerId": "74e8da7d-e4f3-48a9-ab44-a15c855cf479",
         "attributes": {}
-      },
-      {
-        "id": "be15e398-4469-4d38-85fc-a982c7fbd6fc",
-        "name": "offline_access",
-        "description": "${role_offline-access}",
-        "composite": false,
-        "clientRole": false,
-        "containerId": "74e8da7d-e4f3-48a9-ab44-a15c855cf479",
-        "attributes": {}
-      },
-      {
-        "id": "1dc5f7f9-d808-4f71-a63f-bd1baa4aa90c",
-        "name": "uma_authorization",
-        "description": "${role_uma_authorization}",
-        "composite": false,
-        "clientRole": false,
-        "containerId": "74e8da7d-e4f3-48a9-ab44-a15c855cf479",
-        "attributes": {}
       }
     ],
     "client": {
-      "flask-app": [
-        {
-          "id": "b2162df5-b1cf-463f-ad25-7ef71f1a5089",
-          "name": "Student",
-          "description": "",
-          "composite": false,
-          "clientRole": true,
-          "containerId": "4de86a3a-889c-4f8d-acd8-a139565b7b39",
-          "attributes": {}
-        }
-      ],
       "realm-management": [
         {
           "id": "fcac83bf-ac69-480f-b320-8d0d520244c0",
@@ -329,10 +296,7 @@
           "attributes": {}
         }
       ],
-      "first.example.org": [],
-      "second.example.org": [],
-      "security-admin-console": [],
-      "react-app": [
+      "first.example.org": [
         {
           "id": "809fa73b-79ee-4ee6-8bd9-ff5bacbb15c7",
           "name": "Student",
@@ -352,6 +316,27 @@
           "attributes": {}
         }
       ],
+      "second.example.org": [
+        {
+          "id": "b2162df5-b1cf-463f-ad25-7ef71f1a5089",
+          "name": "Student",
+          "description": "",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "4de86a3a-889c-4f8d-acd8-a139565b7b39",
+          "attributes": {}
+        },
+        {
+          "id": "48e43057-9d44-4f58-9541-abd5b0a52339",
+          "name": "Lecturer",
+          "description": "",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "4de86a3a-889c-4f8d-acd8-a139565b7b39",
+          "attributes": {}
+        }
+      ],
+      "security-admin-console": [],
       "admin-cli": [],
       "account-console": [],
       "broker": [
@@ -465,7 +450,14 @@
       "realmRoles": [
         "lecturer"
       ],
-      "clientRoles": {}
+      "clientRoles": {
+        "first.example.org": [
+          "Lecturer"
+        ],
+        "second.example.org": [
+          "Lecturer"
+        ]
+      }
     },
     {
       "id": "c420eed1-8d04-4849-b945-0b60421b3453",
@@ -477,7 +469,10 @@
         "student"
       ],
       "clientRoles": {
-        "react-app": [
+        "second.example.org": [
+          "Student"
+        ],
+        "first.example.org": [
           "Student"
         ]
       }
@@ -533,14 +528,6 @@
   "webAuthnPolicyPasswordlessAvoidSameAuthenticatorRegister": false,
   "webAuthnPolicyPasswordlessAcceptableAaguids": [],
   "webAuthnPolicyPasswordlessExtraOrigins": [],
-  "scopeMappings": [
-    {
-      "clientScope": "offline_access",
-      "roles": [
-        "offline_access"
-      ]
-    }
-  ],
   "clientScopeMappings": {
     "account": [
       {
@@ -742,138 +729,13 @@
       ]
     },
     {
-      "id": "91432c9a-0bb2-404d-ba29-fad0dd343556",
-      "clientId": "first.example.org",
-      "name": "First site",
-      "description": "",
-      "rootUrl": "https://first.example.org",
-      "adminUrl": "https://first.example.org",
-      "baseUrl": "https://first.example.org",
-      "surrogateAuthRequired": false,
-      "enabled": true,
-      "alwaysDisplayInConsole": false,
-      "clientAuthenticatorType": "client-secret",
-      "secret": "**********",
-      "redirectUris": [
-        "https://first.example.org/*"
-      ],
-      "webOrigins": [
-        "https://first.example.org"
-      ],
-      "notBefore": 0,
-      "bearerOnly": false,
-      "consentRequired": false,
-      "standardFlowEnabled": true,
-      "implicitFlowEnabled": false,
-      "directAccessGrantsEnabled": true,
-      "serviceAccountsEnabled": false,
-      "publicClient": false,
-      "frontchannelLogout": true,
-      "protocol": "openid-connect",
-      "attributes": {
-        "realm_client": "false",
-        "oidc.ciba.grant.enabled": "false",
-        "client.secret.creation.time": "1733565069",
-        "backchannel.logout.session.required": "true",
-        "login_theme": "keycloak.v2",
-        "post.logout.redirect.uris": "https://first.example.org/*",
-        "oauth2.device.authorization.grant.enabled": "false",
-        "display.on.consent.screen": "false",
-        "backchannel.logout.revoke.offline.tokens": "false"
-      },
-      "authenticationFlowBindingOverrides": {},
-      "fullScopeAllowed": true,
-      "nodeReRegistrationTimeout": -1,
-      "defaultClientScopes": [
-        "web-origins",
-        "acr",
-        "roles",
-        "profile",
-        "basic",
-        "email"
-      ],
-      "optionalClientScopes": [
-        "address",
-        "phone",
-        "offline_access",
-        "microprofile-jwt"
-      ]
-    },
-    {
-      "id": "4de86a3a-889c-4f8d-acd8-a139565b7b39",
-      "clientId": "flask-app",
-      "name": "",
-      "description": "",
-      "rootUrl": "http://second.example.org",
-      "adminUrl": "",
-      "baseUrl": "",
-      "surrogateAuthRequired": false,
-      "enabled": true,
-      "alwaysDisplayInConsole": false,
-      "clientAuthenticatorType": "client-secret",
-      "secret": "BT2BAoG2EDy5dLWfUUK3wWGsqL2jlqXc",
-      "redirectUris": [
-        "http://127.0.0.1:5000/*",
-        "http://second.example.org/*"
-      ],
-      "webOrigins": [
-        "http://second.example.org"
-      ],
-      "notBefore": 0,
-      "bearerOnly": false,
-      "consentRequired": false,
-      "standardFlowEnabled": true,
-      "implicitFlowEnabled": false,
-      "directAccessGrantsEnabled": true,
-      "serviceAccountsEnabled": false,
-      "publicClient": false,
-      "frontchannelLogout": true,
-      "protocol": "openid-connect",
-      "attributes": {
-        "client.secret.creation.time": "1733598241",
-        "client.introspection.response.allow.jwt.claim.enabled": "false",
-        "post.logout.redirect.uris": "http://second.example.org/##http://127.0.0.1:5000/",
-        "oauth2.device.authorization.grant.enabled": "false",
-        "backchannel.logout.revoke.offline.tokens": "false",
-        "use.refresh.tokens": "true",
-        "jwt.credential.certificate": "MIICoTCCAYkCBgGToHyzmDANBgkqhkiG9w0BAQsFADAUMRIwEAYDVQQDDAlmbGFzay1hcHAwHhcNMjQxMjA3MDkzNzI3WhcNMzQxMjA3MDkzOTA3WjAUMRIwEAYDVQQDDAlmbGFzay1hcHAwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCuigxqldDrfZr2QqjGC8rWCVYwdvkm1LqgGM0zmYbddYuLRiFbNj7bvuYGs/k2k+HMYFi9+Sqg2Ev7jAJH0FfN+nzsTbeaxeQLz68QlTJRbHANeOGxicZCe5c2OeMEa5tlcyhP2pPTAo9IwL7JAa6Y5XkxrSs2KQJ90wJBaBvDN4FWZoGVpSpZcYruwLm8qKOcujD53Z0mDivVEoQBWrCM3BKp7R4EOZZR+PcNIxc4eDHxUzwyVR5Km2Pa+yzK3E3sze8EhNw31drH9RyHFnC6+FpPSsIwgLTh5umfGZDRZBt63xHoG0+1E6IV84lkedOTtT9+Q/UKGIR0Z1ndkWGFAgMBAAEwDQYJKoZIhvcNAQELBQADggEBAEsyEip3AXFNZjcfdLVd5W8CryCKy/9+klB74oEiziWnuVJFfeBrUbmrTZ5ZvZJHy31xUmrnb/3b0LbIVOtfo3QkgJKgfKWsN2le79pVWlBBl7IN1HLgvpvROpTfcZaGTzwt768pmyCbCv5U+UxXmnZYW/qpzpTKmUzYJ/lyWPrYmXNoqmxc/uu9MAW24ltTzmABgY53iZjJ+gAKtUn2NzmkishX6ztp0dGg9YXA13VxS/MBNjiPXPBijkFKLyDhZhKBzQtlK9VnlkJN9pnH0uHr0CxLfVy+7G00wufpqcpGS24s8/g3lmpzv5HHX1AYxjeRqgxQ7mceIdqx5D8OJ2Y=",
-        "realm_client": "false",
-        "oidc.ciba.grant.enabled": "false",
-        "client.use.lightweight.access.token.enabled": "false",
-        "backchannel.logout.session.required": "true",
-        "client_credentials.use_refresh_token": "false",
-        "tls.client.certificate.bound.access.tokens": "false",
-        "require.pushed.authorization.requests": "false",
-        "acr.loa.map": "{}",
-        "display.on.consent.screen": "false",
-        "token.response.type.bearer.lower-case": "false"
-      },
-      "authenticationFlowBindingOverrides": {},
-      "fullScopeAllowed": true,
-      "nodeReRegistrationTimeout": -1,
-      "defaultClientScopes": [
-        "web-origins",
-        "acr",
-        "roles",
-        "profile",
-        "basic",
-        "email"
-      ],
-      "optionalClientScopes": [
-        "address",
-        "phone",
-        "offline_access",
-        "microprofile-jwt"
-      ]
-    },
-    {
       "id": "440f094d-a03b-4394-ba2e-b5d38dc5e4e7",
-      "clientId": "react-app",
-      "name": "",
+      "clientId": "first.example.org",
+      "name": "react app",
       "description": "",
       "rootUrl": "https://first.example.org",
       "adminUrl": "",
-      "baseUrl": "",
+      "baseUrl": "https://first.example.org",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
@@ -897,7 +759,7 @@
       "attributes": {
         "client.introspection.response.allow.jwt.claim.enabled": "false",
         "login_theme": "keycloak.v2",
-        "post.logout.redirect.uris": "+",
+        "post.logout.redirect.uris": "https://first.example.org/*",
         "oauth2.device.authorization.grant.enabled": "false",
         "backchannel.logout.revoke.offline.tokens": "false",
         "use.refresh.tokens": "true",
@@ -973,18 +835,18 @@
       ]
     },
     {
-      "id": "d35f6d82-fa7c-419b-a1f4-5fa847185c72",
+      "id": "4de86a3a-889c-4f8d-acd8-a139565b7b39",
       "clientId": "second.example.org",
-      "name": "Second site",
+      "name": "flask app",
       "description": "",
       "rootUrl": "http://second.example.org",
-      "adminUrl": "http://second.example.org",
-      "baseUrl": "http://second.example.org",
+      "adminUrl": "",
+      "baseUrl": "",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
-      "secret": "**********",
+      "secret": "BT2BAoG2EDy5dLWfUUK3wWGsqL2jlqXc",
       "redirectUris": [
         "http://second.example.org/*"
       ],
@@ -1002,13 +864,23 @@
       "frontchannelLogout": true,
       "protocol": "openid-connect",
       "attributes": {
+        "client.secret.creation.time": "1733598241",
+        "client.introspection.response.allow.jwt.claim.enabled": "false",
+        "post.logout.redirect.uris": "http://second.example.org/",
+        "oauth2.device.authorization.grant.enabled": "false",
+        "backchannel.logout.revoke.offline.tokens": "false",
+        "use.refresh.tokens": "true",
+        "jwt.credential.certificate": "MIICoTCCAYkCBgGToHyzmDANBgkqhkiG9w0BAQsFADAUMRIwEAYDVQQDDAlmbGFzay1hcHAwHhcNMjQxMjA3MDkzNzI3WhcNMzQxMjA3MDkzOTA3WjAUMRIwEAYDVQQDDAlmbGFzay1hcHAwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCuigxqldDrfZr2QqjGC8rWCVYwdvkm1LqgGM0zmYbddYuLRiFbNj7bvuYGs/k2k+HMYFi9+Sqg2Ev7jAJH0FfN+nzsTbeaxeQLz68QlTJRbHANeOGxicZCe5c2OeMEa5tlcyhP2pPTAo9IwL7JAa6Y5XkxrSs2KQJ90wJBaBvDN4FWZoGVpSpZcYruwLm8qKOcujD53Z0mDivVEoQBWrCM3BKp7R4EOZZR+PcNIxc4eDHxUzwyVR5Km2Pa+yzK3E3sze8EhNw31drH9RyHFnC6+FpPSsIwgLTh5umfGZDRZBt63xHoG0+1E6IV84lkedOTtT9+Q/UKGIR0Z1ndkWGFAgMBAAEwDQYJKoZIhvcNAQELBQADggEBAEsyEip3AXFNZjcfdLVd5W8CryCKy/9+klB74oEiziWnuVJFfeBrUbmrTZ5ZvZJHy31xUmrnb/3b0LbIVOtfo3QkgJKgfKWsN2le79pVWlBBl7IN1HLgvpvROpTfcZaGTzwt768pmyCbCv5U+UxXmnZYW/qpzpTKmUzYJ/lyWPrYmXNoqmxc/uu9MAW24ltTzmABgY53iZjJ+gAKtUn2NzmkishX6ztp0dGg9YXA13VxS/MBNjiPXPBijkFKLyDhZhKBzQtlK9VnlkJN9pnH0uHr0CxLfVy+7G00wufpqcpGS24s8/g3lmpzv5HHX1AYxjeRqgxQ7mceIdqx5D8OJ2Y=",
         "realm_client": "false",
         "oidc.ciba.grant.enabled": "false",
-        "client.secret.creation.time": "1733565128",
+        "client.use.lightweight.access.token.enabled": "false",
         "backchannel.logout.session.required": "true",
-        "post.logout.redirect.uris": "http://second.example.org/*",
-        "oauth2.device.authorization.grant.enabled": "false",
-        "backchannel.logout.revoke.offline.tokens": "false"
+        "client_credentials.use_refresh_token": "false",
+        "tls.client.certificate.bound.access.tokens": "false",
+        "require.pushed.authorization.requests": "false",
+        "acr.loa.map": "{}",
+        "display.on.consent.screen": "false",
+        "token.response.type.bearer.lower-case": "false"
       },
       "authenticationFlowBindingOverrides": {},
       "fullScopeAllowed": true,
@@ -1764,14 +1636,14 @@
         "subComponents": {},
         "config": {
           "allowed-protocol-mapper-types": [
-            "saml-user-property-mapper",
-            "oidc-sha256-pairwise-sub-mapper",
             "saml-role-list-mapper",
-            "oidc-usermodel-property-mapper",
-            "oidc-address-mapper",
+            "oidc-sha256-pairwise-sub-mapper",
             "saml-user-attribute-mapper",
-            "oidc-usermodel-attribute-mapper",
-            "oidc-full-name-mapper"
+            "oidc-full-name-mapper",
+            "oidc-address-mapper",
+            "saml-user-property-mapper",
+            "oidc-usermodel-property-mapper",
+            "oidc-usermodel-attribute-mapper"
           ]
         }
       },
@@ -1807,14 +1679,14 @@
         "subComponents": {},
         "config": {
           "allowed-protocol-mapper-types": [
-            "oidc-address-mapper",
-            "oidc-sha256-pairwise-sub-mapper",
             "oidc-usermodel-attribute-mapper",
-            "saml-user-property-mapper",
+            "oidc-sha256-pairwise-sub-mapper",
             "saml-role-list-mapper",
-            "saml-user-attribute-mapper",
             "oidc-full-name-mapper",
-            "oidc-usermodel-property-mapper"
+            "oidc-address-mapper",
+            "saml-user-property-mapper",
+            "oidc-usermodel-property-mapper",
+            "saml-user-attribute-mapper"
           ]
         }
       }
@@ -1844,14 +1716,14 @@
                 "group.name.ldap.attribute": [
                   "cn"
                 ],
+                "membership.user.ldap.attribute": [
+                  "uid"
+                ],
                 "membership.ldap.attribute": [
                   "memberUid"
                 ],
                 "preserve.group.inheritance": [
                   "false"
-                ],
-                "membership.user.ldap.attribute": [
-                  "uid"
                 ],
                 "ignore.missing.groups": [
                   "false"
@@ -1908,10 +1780,10 @@
                 "is.mandatory.in.ldap": [
                   "false"
                 ],
-                "read.only": [
+                "always.read.value.from.ldap": [
                   "true"
                 ],
-                "always.read.value.from.ldap": [
+                "read.only": [
                   "true"
                 ],
                 "user.model.attribute": [
@@ -1931,10 +1803,10 @@
                 "is.mandatory.in.ldap": [
                   "false"
                 ],
-                "read.only": [
+                "always.read.value.from.ldap": [
                   "true"
                 ],
-                "always.read.value.from.ldap": [
+                "read.only": [
                   "true"
                 ],
                 "user.model.attribute": [
@@ -1954,11 +1826,11 @@
                 "is.mandatory.in.ldap": [
                   "true"
                 ],
-                "always.read.value.from.ldap": [
-                  "true"
-                ],
                 "read.only": [
                   "false"
+                ],
+                "always.read.value.from.ldap": [
+                  "true"
                 ],
                 "user.model.attribute": [
                   "lastName"
@@ -2014,20 +1886,20 @@
           ]
         },
         "config": {
-          "fullSyncPeriod": [
-            "-1"
-          ],
           "pagination": [
             "false"
+          ],
+          "fullSyncPeriod": [
+            "-1"
           ],
           "startTls": [
             "false"
           ],
-          "usersDn": [
-            "ou=users,dc=example,dc=org"
-          ],
           "connectionPooling": [
             "false"
+          ],
+          "usersDn": [
+            "ou=users,dc=example,dc=org"
           ],
           "cachePolicy": [
             "DEFAULT"
@@ -2041,17 +1913,17 @@
           "enabled": [
             "true"
           ],
-          "bindCredential": [
-            "admin"
-          ],
           "changedSyncPeriod": [
             "-1"
           ],
-          "usernameLDAPAttribute": [
-            "uid"
+          "bindCredential": [
+            "admin"
           ],
           "bindDn": [
             "cn=admin,dc=example,dc=org"
+          ],
+          "usernameLDAPAttribute": [
+            "uid"
           ],
           "lastSync": [
             "1733565468"

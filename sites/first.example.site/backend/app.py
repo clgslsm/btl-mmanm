@@ -22,6 +22,8 @@ KEYCLOAK_PUBLIC_KEY_URL = "https://sso.example.org/realms/demo-sso-realm"
 
 DATABASE = "university.db"
 
+CLIENT_ID = 'first.example.org'
+
 
 def get_db():
     db = getattr(g, "_database", None)
@@ -68,9 +70,10 @@ def close_connection(exception):
 
 
 # Initialize the database
-init_db()
+# init_db()
 
 def get_keycloak_public_key(retries=5, delay=5):
+    time.sleep(5) # Wait for Keycloak to start
     for attempt in range(retries):
         try:
             response = requests.get(KEYCLOAK_PUBLIC_KEY_URL)
@@ -163,7 +166,7 @@ def get_resource():
 
     print("decoded_token: ", decoded_token)
     roles = (
-        decoded_token.get("resource_access", {}).get("react-app", {}).get("roles", [])
+        decoded_token.get("resource_access", {}).get(CLIENT_ID, {}).get("roles", [])
     )
     if "Student" not in roles:
         return jsonify({"error": "Insufficient permissions"}), 403
@@ -269,7 +272,7 @@ def post_resource():
         return jsonify({"error": "Invalid or expired token"}), 401
 
     roles = (
-        decoded_token.get("resource_access", {}).get("react-app", {}).get("roles", [])
+        decoded_token.get("resource_access", {}).get(CLIENT_ID, {}).get("roles", [])
     )
     if "Student" not in roles:
         return jsonify({"error": "Insufficient permissions"}), 403
@@ -362,7 +365,7 @@ def put_resource():
         return jsonify({"error": "Invalid or expired token"}), 401
 
     roles = (
-        decoded_token.get("resource_access", {}).get("react-app", {}).get("roles", [])
+        decoded_token.get("resource_access", {}).get(CLIENT_ID, {}).get("roles", [])
     )
     if "Student" not in roles:
         return jsonify({"error": "Insufficient permissions"}), 403
@@ -424,7 +427,7 @@ def delete_resource():
         return jsonify({"error": "Invalid or expired token"}), 401
 
     roles = (
-        decoded_token.get("resource_access", {}).get("react-app", {}).get("roles", [])
+        decoded_token.get("resource_access", {}).get(CLIENT_ID, {}).get("roles", [])
     )
     if "Student" not in roles:
         return jsonify({"error": "Insufficient permissions"}), 403

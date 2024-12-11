@@ -32,7 +32,7 @@ const Course = () => {
           if (response.status === 401) {
             setErrorMessage("Unauthorized. Invalid or expired token.");
           } else if (response.status === 403) {
-            setErrorMessage("Forbidden. Insufficient permissions.");
+            setErrorMessage("Forbidden. Only students can access this site.");
           } else {
             setErrorMessage("An unexpected error occurred.");
           }

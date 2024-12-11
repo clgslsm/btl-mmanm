@@ -8,7 +8,7 @@ function Home() {
 
   return (
     <div className="home-container">
-      <h1 className="home-title">Welcome to MyApp</h1>
+      <h1 className="home-title">Welcome to First site</h1>
       <p className="home-subtitle">
         {keycloak.authenticated
           ? `Hello, ${keycloak.tokenParsed?.name || "User"}!`
