@@ -27,6 +27,7 @@ app.config.update(
         "OIDC_USER_INFO_ENABLED": True,
         "OIDC_CALLBACK_ROUTE": "/oidc/callback",
         "OIDC_OVERWRITE_REDIRECT_URI": "https://second.example.org/oidc/callback",
+        "OIDC_OVERWRITE_POST_LOGOUT_REDIRECT_URI": "https://second.example.org/",
         "OIDC_ID_TOKEN_COOKIE_SECURE": False,
         "OIDC_TOKEN_TYPE_HINT": "access_token",
         "OIDC_CLOCK_SKEW": 560,
