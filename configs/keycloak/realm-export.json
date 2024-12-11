@@ -867,10 +867,10 @@
       "frontchannelLogout": true,
       "protocol": "openid-connect",
       "attributes": {
-        "client.secret.creation.time": "1733933566",
+        "client.secret.creation.time": "1733938570",
         "client.introspection.response.allow.jwt.claim.enabled": "false",
         "frontchannel.logout.url": "https://second.example.org",
-        "post.logout.redirect.uris": "https://second.example.org/##https://127.0.0.1:5000/",
+        "post.logout.redirect.uris": "https://second.example.org/##https://127.0.0.1:5000/##http://second.example.org/",
         "oauth2.device.authorization.grant.enabled": "false",
         "backchannel.logout.revoke.offline.tokens": "false",
         "use.refresh.tokens": "true",
