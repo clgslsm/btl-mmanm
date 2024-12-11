@@ -869,7 +869,7 @@
       "attributes": {
         "client.secret.creation.time": "1733938570",
         "client.introspection.response.allow.jwt.claim.enabled": "false",
-        "frontchannel.logout.url": "https://second.example.org",
+        "frontchannel.logout.url": "https://second.example.org/logout",
         "post.logout.redirect.uris": "https://second.example.org/##https://127.0.0.1:5000/##http://second.example.org/",
         "oauth2.device.authorization.grant.enabled": "false",
         "backchannel.logout.revoke.offline.tokens": "false",
