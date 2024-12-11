@@ -1,5 +1,5 @@
 # AUTO-GENERATED FILE - DO NOT EDIT!! Use ldapmodify.
-# CRC32 acfd88c1
+# CRC32 db3b23cc
 dn: cn={8}samba
 objectClass: olcSchemaConfig
 cn: {8}samba
@@ -227,9 +227,9 @@ olcObjectClasses: {11}( 1.3.6.1.4.1.7165.2.2.16 NAME 'sambaTrustedDomain' DE
  tyIdentifier $ sambaTrustForestTrustInfo $ sambaTrustPosixOffset $ sambaSup
  portedEncryptionTypes ) )
 structuralObjectClass: olcSchemaConfig
-entryUUID: 349be6e0-401b-103f-813e-45d939f73420
+entryUUID: cf8ba4a0-4c47-103f-9b63-e596397f9640
 creatorsName: gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth
-createTimestamp: 20241126082139Z
-entryCSN: 20241126082139.869835Z#000000#000#000000
+createTimestamp: 20241211201111Z
+entryCSN: 20241211201111.619562Z#000000#000#000000
 modifiersName: gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth
-modifyTimestamp: 20241126082139Z
+modifyTimestamp: 20241211201111Z

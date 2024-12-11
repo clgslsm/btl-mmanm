@@ -4,23 +4,10 @@ import jwt  # For decoding tokens locally
 from flasgger import Swagger  # Import Swagger
 import sqlite3, json, os
 from flask_cors import CORS  # Import CORS
+import time
 
 app = Flask(__name__)
 CORS(app)
-
-app.config["APPLICATION_ROOT"] = "/api"
-
-client_secrets = json.load(open("client_secrets.json"))
-
-app.config.update(
-    {
-        "SECRET_KEY": client_secrets["web"]["client_secret"],
-        "OIDC_CLIENT_SECRETS": client_secrets,
-        "OIDC_SCOPES": ["openid", "email", "profile"],
-        "OIDC_INTROSPECTION_AUTH_METHOD": "client_secret_post",
-        "OIDC_USER_INFO_ENABLED": True,
-    }
-)
 
 swagger = Swagger(
     app,
@@ -34,6 +21,8 @@ swagger = Swagger(
 KEYCLOAK_PUBLIC_KEY_URL = "https://sso.example.org/realms/demo-sso-realm"
 
 DATABASE = "university.db"
+
+CLIENT_ID = 'first.example.org'
 
 
 def get_db():
@@ -81,21 +70,24 @@ def close_connection(exception):
 
 
 # Initialize the database
-init_db()
+# init_db()
 
-
-def get_keycloak_public_key():
-    try:
-        response = requests.get(f"{KEYCLOAK_PUBLIC_KEY_URL}", verify=False)
-        response.raise_for_status()
-        key_data = response.json()
-        # Format the public key properly
-        public_key = key_data.get("public_key")
-        return f"-----BEGIN PUBLIC KEY-----\n{public_key}\n-----END PUBLIC KEY-----"
-    except Exception as e:
-        print(f"Error fetching public key: {e}")
-        return None
-
+def get_keycloak_public_key(retries=5, delay=5):
+    time.sleep(5) # Wait for Keycloak to start
+    for attempt in range(retries):
+        try:
+            response = requests.get(KEYCLOAK_PUBLIC_KEY_URL)
+            response.raise_for_status()
+            key_data = response.json()
+            public_key = key_data.get("public_key")
+            return f"-----BEGIN PUBLIC KEY-----\n{public_key}\n-----END PUBLIC KEY-----"
+        except Exception as e:
+            print(f"Attempt {attempt + 1}/{retries} failed: {e}")
+            if attempt < retries - 1:
+                time.sleep(delay)
+            else:
+                print("Failed to fetch public key after retries.")
+                return None
 
 PUBLIC_KEY = get_keycloak_public_key()
 
@@ -174,7 +166,7 @@ def get_resource():
 
     print("decoded_token: ", decoded_token)
     roles = (
-        decoded_token.get("resource_access", {}).get("react-app", {}).get("roles", [])
+        decoded_token.get("resource_access", {}).get(CLIENT_ID, {}).get("roles", [])
     )
     if "Student" not in roles:
         return jsonify({"error": "Insufficient permissions"}), 403
@@ -280,7 +272,7 @@ def post_resource():
         return jsonify({"error": "Invalid or expired token"}), 401
 
     roles = (
-        decoded_token.get("resource_access", {}).get("react-app", {}).get("roles", [])
+        decoded_token.get("resource_access", {}).get(CLIENT_ID, {}).get("roles", [])
     )
     if "Student" not in roles:
         return jsonify({"error": "Insufficient permissions"}), 403
@@ -373,7 +365,7 @@ def put_resource():
         return jsonify({"error": "Invalid or expired token"}), 401
 
     roles = (
-        decoded_token.get("resource_access", {}).get("react-app", {}).get("roles", [])
+        decoded_token.get("resource_access", {}).get(CLIENT_ID, {}).get("roles", [])
     )
     if "Student" not in roles:
         return jsonify({"error": "Insufficient permissions"}), 403
@@ -435,7 +427,7 @@ def delete_resource():
         return jsonify({"error": "Invalid or expired token"}), 401
 
     roles = (
-        decoded_token.get("resource_access", {}).get("react-app", {}).get("roles", [])
+        decoded_token.get("resource_access", {}).get(CLIENT_ID, {}).get("roles", [])
     )
     if "Student" not in roles:
         return jsonify({"error": "Insufficient permissions"}), 403

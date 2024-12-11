@@ -19,7 +19,7 @@ const Course = () => {
           return;
         }
 
-        const response = await fetch("http://localhost:5001/api/resource", {
+        const response = await fetch("/api/resource", {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`,
@@ -32,7 +32,7 @@ const Course = () => {
           if (response.status === 401) {
             setErrorMessage("Unauthorized. Invalid or expired token.");
           } else if (response.status === 403) {
-            setErrorMessage("Forbidden. Insufficient permissions.");
+            setErrorMessage("Forbidden. Only students can access this site.");
           } else {
             setErrorMessage("An unexpected error occurred.");
           }

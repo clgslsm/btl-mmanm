@@ -10,7 +10,7 @@ function Navbar() {
     <nav className="navbar">
       <div className="navbar-container">
         <Link to="/" className="navbar-logo">
-          MyApp
+          First Example Site
         </Link>
         <ul className="navbar-links">
           <li>

@@ -33,5 +33,5 @@ COPY ./backend .
 WORKDIR /
 COPY ./entrypoint.sh .
 RUN chmod +x entrypoint.sh
-ENV REQUESTS_CA_BUNDLE=/etc/ssl/certs/sso.example.org.pem
+RUN cat /usr/local/share/ca-certificates/sso.example.org.crt | tee -a /usr/local/lib/python3.12/site-packages/certifi/cacert.pem
 ENTRYPOINT ["/entrypoint.sh"]

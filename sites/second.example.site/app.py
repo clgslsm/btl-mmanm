@@ -20,24 +20,29 @@ client_secrets = json.load(open("client_secrets.json"))
 app = Flask(__name__)
 app.config.update(
     {
-        "SECRET_KEY": client_secrets["web"]["client_secret"],
+        "SECRET_KEY": os.environ.get("FLASK_SECRET_KEY", os.urandom(24)),
         "OIDC_CLIENT_SECRETS": client_secrets,
         "OIDC_SCOPES": ["openid", "email", "profile"],
         "OIDC_INTROSPECTION_AUTH_METHOD": "client_secret_post",
         "OIDC_USER_INFO_ENABLED": True,
-        # "OVERWRITE_REDIRECT_URI": "http://second.example.org/authorize",
+        "OIDC_CALLBACK_ROUTE": "/oidc/callback",
+        "OIDC_OVERWRITE_REDIRECT_URI": "https://second.example.org/oidc/callback",
+        "OIDC_OVERWRITE_POST_LOGOUT_REDIRECT_URI": "https://second.example.org/",
+        "OIDC_ID_TOKEN_COOKIE_SECURE": False,
+        "OIDC_TOKEN_TYPE_HINT": "access_token",
+        "OIDC_CLOCK_SKEW": 560,
+        "OIDC_COOKIE_SECURE": False,
     }
 )
 oidc = OpenIDConnect(app)
 
-# Add SQLAlchemy config
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///scholarships.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["PREFERRED_URL_SCHEME"] = "https"
 
 db = SQLAlchemy(app)
 
 
-# Add Scholarship Model
 class Scholarship(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), nullable=False)
@@ -47,6 +52,12 @@ class Scholarship(db.Model):
     deadline = db.Column(db.DateTime)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+@app.route("/")
+def home():
+    print('check_login:', oidc.user_loggedin)
+    # if not oidc.user_loggedin:
+    #     session.clear() # Clear the session to remove any stale data
+    return render_template("home.html", oidc=oidc)
 
 @app.route("/profile")
 @oidc.require_login
@@ -87,11 +98,6 @@ def logout_sso():
     )
 
 
-@app.route("/")
-def home():
-    return render_template("home.html", oidc=oidc)
-
-
 @app.template_filter("timestamp_to_date")
 def timestamp_to_date(timestamp):
     if timestamp:
@@ -106,6 +112,8 @@ def timestamp_to_date(timestamp):
 @app.route("/refresh_token")
 @oidc.require_login
 def refresh_token():
+    if not oidc.user_loggedin:
+        return redirect(url_for("home"))
     refresh_token = oidc.get_refresh_token()
 
     if not refresh_token:
@@ -167,6 +175,8 @@ def get_user_roles(access_token):
 @app.route("/scholarships")
 @oidc.require_login
 def scholarships():
+    if not oidc.user_loggedin:
+        return redirect(url_for("home"))
     info = oidc.user_getinfo(["email"])
     user_email = info.get("email")
 
@@ -195,6 +205,8 @@ def scholarships():
 @app.route("/scholarship/add", methods=["GET", "POST"])
 @oidc.require_login
 def add_scholarship():
+    if not oidc.user_loggedin:
+        return redirect(url_for("home"))
     if request.method == "POST":
         info = oidc.user_getinfo(["email"])
         user_email = info.get("email")

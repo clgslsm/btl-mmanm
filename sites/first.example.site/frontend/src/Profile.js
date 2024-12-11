@@ -51,7 +51,14 @@ const Profile = () => {
         <div className="user-info">
           <p><strong>Name:</strong> {userInfo.name}</p>
           <p><strong>Email:</strong> {userInfo.email}</p>
-          <p><strong>Roles:</strong> {userInfo.realm_access?.roles.join(", ")}</p>
+          <p>
+            <strong>Role:</strong>{" "}
+            {userInfo.realm_access?.roles.includes("student")
+              ? "student"
+              : userInfo.realm_access?.roles.includes("lecturer")
+              ? "lecturer"
+              : "unknown"}
+          </p>
           <p><strong>Groups:</strong> {userInfo.groups?.join(", ") || "None"}</p>
           <p><strong>Token Expires At:</strong> {expiryTime}</p>
         </div>
