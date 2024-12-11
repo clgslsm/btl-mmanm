@@ -850,7 +850,7 @@
       "clientAuthenticatorType": "client-secret",
       "secret": "**********",
       "redirectUris": [
-        "http://127.0.0.1:5000/*",
+        "https://127.0.0.1:5000/*",
         "https://second.example.org/*"
       ],
       "webOrigins": [
@@ -869,7 +869,8 @@
       "attributes": {
         "client.secret.creation.time": "1733933566",
         "client.introspection.response.allow.jwt.claim.enabled": "false",
-        "post.logout.redirect.uris": "https://second.example.org/##http://127.0.0.1:5000/",
+        "frontchannel.logout.url": "https://second.example.org",
+        "post.logout.redirect.uris": "https://second.example.org/##https://127.0.0.1:5000/",
         "oauth2.device.authorization.grant.enabled": "false",
         "backchannel.logout.revoke.offline.tokens": "false",
         "use.refresh.tokens": "true",
@@ -1638,14 +1639,14 @@
         "subComponents": {},
         "config": {
           "allowed-protocol-mapper-types": [
-            "oidc-usermodel-attribute-mapper",
-            "oidc-sha256-pairwise-sub-mapper",
-            "saml-role-list-mapper",
-            "saml-user-property-mapper",
-            "oidc-address-mapper",
             "oidc-full-name-mapper",
+            "oidc-usermodel-property-mapper",
+            "oidc-sha256-pairwise-sub-mapper",
+            "saml-user-property-mapper",
             "saml-user-attribute-mapper",
-            "oidc-usermodel-property-mapper"
+            "saml-role-list-mapper",
+            "oidc-address-mapper",
+            "oidc-usermodel-attribute-mapper"
           ]
         }
       },
@@ -1681,14 +1682,14 @@
         "subComponents": {},
         "config": {
           "allowed-protocol-mapper-types": [
+            "saml-user-property-mapper",
             "oidc-address-mapper",
             "saml-user-attribute-mapper",
-            "oidc-full-name-mapper",
-            "oidc-usermodel-attribute-mapper",
             "oidc-sha256-pairwise-sub-mapper",
-            "oidc-usermodel-property-mapper",
             "saml-role-list-mapper",
-            "saml-user-property-mapper"
+            "oidc-full-name-mapper",
+            "oidc-usermodel-property-mapper",
+            "oidc-usermodel-attribute-mapper"
           ]
         }
       }
@@ -1718,26 +1719,26 @@
                 "group.name.ldap.attribute": [
                   "cn"
                 ],
-                "ignore.missing.groups": [
-                  "false"
-                ],
                 "membership.ldap.attribute": [
                   "memberUid"
                 ],
                 "membership.user.ldap.attribute": [
                   "uid"
                 ],
+                "ignore.missing.groups": [
+                  "false"
+                ],
                 "preserve.group.inheritance": [
                   "false"
+                ],
+                "group.object.classes": [
+                  "posixGroup"
                 ],
                 "memberof.ldap.attribute": [
                   "inetOrgPerson"
                 ],
                 "groups.dn": [
                   "ou=groups,dc=example,dc=org"
-                ],
-                "group.object.classes": [
-                  "posixGroup"
                 ],
                 "groups.path": [
                   "/"
@@ -1759,10 +1760,10 @@
                 "is.mandatory.in.ldap": [
                   "true"
                 ],
-                "always.read.value.from.ldap": [
+                "read.only": [
                   "false"
                 ],
-                "read.only": [
+                "always.read.value.from.ldap": [
                   "false"
                 ],
                 "user.model.attribute": [
@@ -1782,10 +1783,10 @@
                 "is.mandatory.in.ldap": [
                   "false"
                 ],
-                "read.only": [
+                "always.read.value.from.ldap": [
                   "true"
                 ],
-                "always.read.value.from.ldap": [
+                "read.only": [
                   "true"
                 ],
                 "user.model.attribute": [
@@ -1851,10 +1852,10 @@
                 "is.mandatory.in.ldap": [
                   "false"
                 ],
-                "always.read.value.from.ldap": [
+                "read.only": [
                   "false"
                 ],
-                "read.only": [
+                "always.read.value.from.ldap": [
                   "false"
                 ],
                 "user.model.attribute": [
@@ -1888,11 +1889,11 @@
           ]
         },
         "config": {
-          "pagination": [
-            "false"
-          ],
           "fullSyncPeriod": [
             "-1"
+          ],
+          "pagination": [
+            "false"
           ],
           "startTls": [
             "false"
@@ -1918,17 +1919,17 @@
           "usernameLDAPAttribute": [
             "uid"
           ],
-          "bindDn": [
-            "cn=admin,dc=example,dc=org"
-          ],
           "changedSyncPeriod": [
             "-1"
+          ],
+          "bindDn": [
+            "cn=admin,dc=example,dc=org"
           ],
           "bindCredential": [
             "**********"
           ],
           "lastSync": [
-            "1733933505"
+            "1733938264"
           ],
           "vendor": [
             "other"
@@ -1936,11 +1937,11 @@
           "uuidLDAPAttribute": [
             "entryUUID"
           ],
-          "connectionUrl": [
-            "ldap://openldap:389"
-          ],
           "allowKerberosAuthentication": [
             "false"
+          ],
+          "connectionUrl": [
+            "ldap://openldap:389"
           ],
           "syncRegistrations": [
             "true"

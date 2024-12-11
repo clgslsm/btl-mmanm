@@ -26,6 +26,7 @@ app.config.update(
         "OIDC_INTROSPECTION_AUTH_METHOD": "client_secret_post",
         "OIDC_USER_INFO_ENABLED": True,
         "OIDC_CALLBACK_ROUTE": "/oidc/callback",
+        "OIDC_OVERWRITE_REDIRECT_URI": "https://second.example.org/oidc/callback",
         "OIDC_ID_TOKEN_COOKIE_SECURE": False,
         "OIDC_TOKEN_TYPE_HINT": "access_token",
         "OIDC_CLOCK_SKEW": 560,
