@@ -53,6 +53,10 @@
         "description": "${role_default-roles}",
         "composite": true,
         "composites": {
+          "realm": [
+            "offline_access",
+            "uma_authorization"
+          ],
           "client": {
             "account": [
               "view-profile",
@@ -65,9 +69,27 @@
         "attributes": {}
       },
       {
+        "id": "d4d73044-f201-49fc-83f1-76a2a154c14b",
+        "name": "offline_access",
+        "description": "${role_offline-access}",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "74e8da7d-e4f3-48a9-ab44-a15c855cf479",
+        "attributes": {}
+      },
+      {
         "id": "ed99699a-60e3-473e-98f0-7758b3fb0b10",
         "name": "student",
         "description": "",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "74e8da7d-e4f3-48a9-ab44-a15c855cf479",
+        "attributes": {}
+      },
+      {
+        "id": "17e64087-7aca-4f76-bda5-c35a13028460",
+        "name": "uma_authorization",
+        "description": "${role_uma_authorization}",
         "composite": false,
         "clientRole": false,
         "containerId": "74e8da7d-e4f3-48a9-ab44-a15c855cf479",
@@ -757,22 +779,16 @@
       "frontchannelLogout": true,
       "protocol": "openid-connect",
       "attributes": {
+        "realm_client": "false",
+        "oidc.ciba.grant.enabled": "false",
+        "backchannel.logout.session.required": "true",
         "client.introspection.response.allow.jwt.claim.enabled": "false",
         "login_theme": "keycloak.v2",
         "post.logout.redirect.uris": "https://first.example.org/*",
         "oauth2.device.authorization.grant.enabled": "false",
-        "backchannel.logout.revoke.offline.tokens": "false",
-        "use.refresh.tokens": "true",
-        "realm_client": "false",
-        "oidc.ciba.grant.enabled": "false",
-        "client.use.lightweight.access.token.enabled": "false",
-        "backchannel.logout.session.required": "true",
-        "client_credentials.use_refresh_token": "false",
-        "tls.client.certificate.bound.access.tokens": "false",
-        "require.pushed.authorization.requests": "false",
-        "acr.loa.map": "{}",
         "display.on.consent.screen": "false",
-        "token.response.type.bearer.lower-case": "false"
+        "backchannel.logout.revoke.offline.tokens": "false",
+        "use.refresh.tokens": "true"
       },
       "authenticationFlowBindingOverrides": {},
       "fullScopeAllowed": true,
@@ -839,7 +855,7 @@
       "clientId": "second.example.org",
       "name": "flask app",
       "description": "",
-      "rootUrl": "http://second.example.org",
+      "rootUrl": "https://second.example.org/",
       "adminUrl": "",
       "baseUrl": "",
       "surrogateAuthRequired": false,
@@ -848,10 +864,11 @@
       "clientAuthenticatorType": "client-secret",
       "secret": "BT2BAoG2EDy5dLWfUUK3wWGsqL2jlqXc",
       "redirectUris": [
-        "http://second.example.org/*"
+        "https://127.0.0.1:5000/*",
+        "https://second.example.org/*"
       ],
       "webOrigins": [
-        "http://second.example.org"
+        "https://second.example.org/"
       ],
       "notBefore": 0,
       "bearerOnly": false,
@@ -866,7 +883,8 @@
       "attributes": {
         "client.secret.creation.time": "1733598241",
         "client.introspection.response.allow.jwt.claim.enabled": "false",
-        "post.logout.redirect.uris": "http://second.example.org/",
+        "frontchannel.logout.url": "https://second.example.org/logout",
+        "post.logout.redirect.uris": "https://second.example.org/##http://second.example.org/",
         "oauth2.device.authorization.grant.enabled": "false",
         "backchannel.logout.revoke.offline.tokens": "false",
         "use.refresh.tokens": "true",
@@ -1568,7 +1586,7 @@
     "xContentTypeOptions": "nosniff",
     "referrerPolicy": "no-referrer",
     "xRobotsTag": "none",
-    "xFrameOptions": "ALLOW-FROM https://first.example.org",
+    "xFrameOptions": "ALLOW-FROM https://first.example.com",
     "contentSecurityPolicy": "frame-src 'self'; frame-ancestors 'self'; object-src 'none';",
     "xXSSProtection": "1; mode=block",
     "strictTransportSecurity": "max-age=31536000; includeSubDomains"
@@ -1636,14 +1654,14 @@
         "subComponents": {},
         "config": {
           "allowed-protocol-mapper-types": [
-            "saml-role-list-mapper",
-            "oidc-sha256-pairwise-sub-mapper",
-            "saml-user-attribute-mapper",
-            "oidc-full-name-mapper",
-            "oidc-address-mapper",
-            "saml-user-property-mapper",
             "oidc-usermodel-property-mapper",
-            "oidc-usermodel-attribute-mapper"
+            "oidc-sha256-pairwise-sub-mapper",
+            "saml-role-list-mapper",
+            "oidc-full-name-mapper",
+            "saml-user-property-mapper",
+            "oidc-address-mapper",
+            "oidc-usermodel-attribute-mapper",
+            "saml-user-attribute-mapper"
           ]
         }
       },
@@ -1679,14 +1697,15 @@
         "subComponents": {},
         "config": {
           "allowed-protocol-mapper-types": [
-            "oidc-usermodel-attribute-mapper",
-            "oidc-sha256-pairwise-sub-mapper",
             "saml-role-list-mapper",
-            "oidc-full-name-mapper",
-            "oidc-address-mapper",
             "saml-user-property-mapper",
+            "saml-role-list-mapper",
             "oidc-usermodel-property-mapper",
-            "saml-user-attribute-mapper"
+            "oidc-address-mapper",
+            "oidc-sha256-pairwise-sub-mapper",
+            "saml-user-attribute-mapper",
+            "oidc-usermodel-attribute-mapper",
+            "oidc-full-name-mapper"
           ]
         }
       }
@@ -1716,17 +1735,17 @@
                 "group.name.ldap.attribute": [
                   "cn"
                 ],
-                "membership.user.ldap.attribute": [
-                  "uid"
+                "preserve.group.inheritance": [
+                  "false"
                 ],
                 "membership.ldap.attribute": [
                   "memberUid"
                 ],
-                "preserve.group.inheritance": [
-                  "false"
-                ],
                 "ignore.missing.groups": [
                   "false"
+                ],
+                "membership.user.ldap.attribute": [
+                  "uid"
                 ],
                 "group.object.classes": [
                   "posixGroup"
@@ -1780,10 +1799,10 @@
                 "is.mandatory.in.ldap": [
                   "false"
                 ],
-                "always.read.value.from.ldap": [
+                "read.only": [
                   "true"
                 ],
-                "read.only": [
+                "always.read.value.from.ldap": [
                   "true"
                 ],
                 "user.model.attribute": [
@@ -1803,10 +1822,10 @@
                 "is.mandatory.in.ldap": [
                   "false"
                 ],
-                "always.read.value.from.ldap": [
+                "read.only": [
                   "true"
                 ],
-                "read.only": [
+                "always.read.value.from.ldap": [
                   "true"
                 ],
                 "user.model.attribute": [
@@ -1849,10 +1868,10 @@
                 "is.mandatory.in.ldap": [
                   "false"
                 ],
-                "always.read.value.from.ldap": [
+                "read.only": [
                   "false"
                 ],
-                "read.only": [
+                "always.read.value.from.ldap": [
                   "false"
                 ],
                 "user.model.attribute": [
@@ -1895,11 +1914,11 @@
           "startTls": [
             "false"
           ],
-          "connectionPooling": [
-            "false"
-          ],
           "usersDn": [
             "ou=users,dc=example,dc=org"
+          ],
+          "connectionPooling": [
+            "false"
           ],
           "cachePolicy": [
             "DEFAULT"
@@ -1913,20 +1932,20 @@
           "enabled": [
             "true"
           ],
-          "changedSyncPeriod": [
-            "-1"
+          "bindDn": [
+            "cn=admin,dc=example,dc=org"
           ],
           "bindCredential": [
             "admin"
           ],
-          "bindDn": [
-            "cn=admin,dc=example,dc=org"
+          "changedSyncPeriod": [
+            "-1"
           ],
           "usernameLDAPAttribute": [
             "uid"
           ],
           "lastSync": [
-            "1733565468"
+            "1733938264"
           ],
           "vendor": [
             "other"

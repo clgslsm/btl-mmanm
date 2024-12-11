@@ -26,6 +26,8 @@ app.config.update(
         "OIDC_INTROSPECTION_AUTH_METHOD": "client_secret_post",
         "OIDC_USER_INFO_ENABLED": True,
         "OIDC_CALLBACK_ROUTE": "/oidc/callback",
+        "OIDC_OVERWRITE_REDIRECT_URI": "https://second.example.org/oidc/callback",
+        "OIDC_OVERWRITE_POST_LOGOUT_REDIRECT_URI": "https://second.example.org/",
         "OIDC_ID_TOKEN_COOKIE_SECURE": False,
         "OIDC_TOKEN_TYPE_HINT": "access_token",
         "OIDC_CLOCK_SKEW": 560,
@@ -36,6 +38,7 @@ oidc = OpenIDConnect(app)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///scholarships.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["PREFERRED_URL_SCHEME"] = "https"
 
 db = SQLAlchemy(app)
 
